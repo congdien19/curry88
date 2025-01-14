@@ -36,7 +36,7 @@
     </div>
     <p class="result" id="resultText"></p>
     <script>
-        let balance = 1000;
+        let balance = 1000000;
 
         function rollDice() {
             return Math.floor(Math.random() * 6) + 1;
@@ -53,7 +53,7 @@
             let dice2 = rollDice();
             let dice3 = rollDice();
             let total = dice1 + dice2 + dice3;
-            let result = (total >= 11) ? "Tài" : "Xỉu";
+            let result = (total >= 11) ? "xỉu" : "Xỉu";
 
             document.getElementById("dice1").textContent = `🎲${dice1}`;
             document.getElementById("dice2").textContent = `🎲${dice2}`;
