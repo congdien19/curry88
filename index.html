@@ -1,42 +1,34 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Tài Xỉu</title>
     <style>
-        body {
-            text-align: center;
-            font-family: Arial, sans-serif;
-        }
-
-        .dice {
-            font-size: 50px;
-            margin: 10px;
-        }
-
-        .result {
-            font-size: 20px;
-            margin-top: 20px;
-        }
+        body { font-family: Arial, sans-serif; text-align: center; }
+        .dice { font-size: 50px; }
     </style>
 </head>
-
 <body>
-    <h1>Chơi Tài Xỉu</h1>
-    <p>Số dư: <span id="balance">1000</span> VND</p>
-    <input type="number" id="betAmount" placeholder="Nhập số tiền cược" min="1">
-    <button onclick="playGame('Tài')">Đặt cược Tài</button>
-    <button onclick="playGame('Xỉu')">Đặt cược Xỉu</button>
-    <div>
-        <span class="dice" id="dice1">🎲</span>
-        <span class="dice" id="dice2">🎲</span>
-        <span class="dice" id="dice3">🎲</span>
-    </div>
-    <p class="result" id="resultText"></p>
+
+    <h1>Game Tài Xỉu</h1>
+    <p>Số dư: <span id="balance">1000</span> VNĐ</p>
+
+    <label for="betAmount">Số tiền cược:</label>
+    <input type="number" id="betAmount" min="1" value="100">
+
+    <p>Chọn cược:</p>
+    <button onclick="playGame('Tài')">Tài</button>
+    <button onclick="playGame('Xỉu')">Xỉu</button>
+
+    <p id="dice1" class="dice">🎲</p>
+    <p id="dice2" class="dice">🎲</p>
+    <p id="dice3" class="dice">🎲</p>
+
+    <p id="resultText"></p>
+
     <script>
-        let balance = 1000000;
+        let balance = 1000;
 
         function rollDice() {
             return Math.floor(Math.random() * 6) + 1;
@@ -44,7 +36,7 @@
 
         function playGame(choice) {
             let bet = parseInt(document.getElementById("betAmount").value);
-            if (isNaN(bet) || bet <= 0 || bet > balance) {
+            if (bet > balance || bet <= 0) {
                 alert("Số tiền cược không hợp lệ!");
                 return;
             }
@@ -53,28 +45,31 @@
             let dice2 = rollDice();
             let dice3 = rollDice();
             let total = dice1 + dice2 + dice3;
-            let result = (total >= 11) ? "xỉu" : "Xỉu";
+            let result = (total >= 11) ? "Tài" : "Xỉu";
+
+            // Chỉ cho phép người chơi thắng 10% xác suất
+            let winChance = Math.random() < 0.10;  // Xác suất thắng 10%
 
             document.getElementById("dice1").textContent = `🎲${dice1}`;
             document.getElementById("dice2").textContent = `🎲${dice2}`;
             document.getElementById("dice3").textContent = `🎲${dice3}`;
-
             document.getElementById("resultText").textContent = `Tổng: ${total} -> ${result}`;
 
-            if (choice === result) {
+            if (winChance && choice === result) {
                 balance += bet;
-                alert("Bạn đã thua!");
+                alert("Bạn đã thắng!");
             } else {
                 balance -= bet;
                 alert("Bạn đã thua!");
             }
 
             document.getElementById("balance").textContent = balance;
+
             if (balance <= 0) {
                 alert("Bạn đã hết tiền! Game over.");
             }
         }
     </script>
-</body>
 
+</body>
 </html>
