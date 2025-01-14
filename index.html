@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Tài Xỉu</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+
+        .dice {
+            font-size: 50px;
+            margin: 10px;
+        }
+
+        .result {
+            font-size: 20px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Chơi Tài Xỉu</h1>
+    <p>Số dư: <span id="balance">1000</span> VND</p>
+    <input type="number" id="betAmount" placeholder="Nhập số tiền cược" min="1">
+    <button onclick="playGame('Tài')">Đặt cược Tài</button>
+    <button onclick="playGame('Xỉu')">Đặt cược Xỉu</button>
+    <div>
+        <span class="dice" id="dice1">🎲</span>
+        <span class="dice" id="dice2">🎲</span>
+        <span class="dice" id="dice3">🎲</span>
+    </div>
+    <p class="result" id="resultText"></p>
+    <script>
+        let balance = 1000;
+
+        function rollDice() {
+            return Math.floor(Math.random() * 6) + 1;
+        }
+
+        function playGame(choice) {
+            let bet = parseInt(document.getElementById("betAmount").value);
+            if (isNaN(bet) || bet <= 0 || bet > balance) {
+                alert("Số tiền cược không hợp lệ!");
+                return;
+            }
+
+            let dice1 = rollDice();
+            let dice2 = rollDice();
+            let dice3 = rollDice();
+            let total = dice1 + dice2 + dice3;
+            let result = (total >= 11) ? "Tài" : "Xỉu";
+
+            document.getElementById("dice1").textContent = `🎲${dice1}`;
+            document.getElementById("dice2").textContent = `🎲${dice2}`;
+            document.getElementById("dice3").textContent = `🎲${dice3}`;
+
+            document.getElementById("resultText").textContent = `Tổng: ${total} -> ${result}`;
+
+            if (choice === result) {
+                balance += bet;
+                alert("Bạn đã thua!");
+            } else {
+                balance -= bet;
+                alert("Bạn đã thua!");
+            }
+
+            document.getElementById("balance").textContent = balance;
+            if (balance <= 0) {
+                alert("Bạn đã hết tiền! Game over.");
+            }
+        }
+    </script>
+</body>
+
+</html>
