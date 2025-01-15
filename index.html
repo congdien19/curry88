@@ -5,27 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Tài Xỉu</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
-        .dice { font-size: 50px; }
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.3);
+        }
+        .dice {
+            font-size: 50px;
+            margin: 10px;
+        }
+        .btn {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 18px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .btn-tai {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .btn-xiu {
+            background-color: #3498db;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.8;
+        }
+        input {
+            padding: 8px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
 
-    <h1>Game Tài Xỉu</h1>
-    <p>Số dư: <span id="balance">1000</span> VNĐ</p>
+    <div class="container">
+        <h1>Game Tài Xỉu</h1>
+        <p>Số dư: <span id="balance">1000</span> VNĐ</p>
 
-    <label for="betAmount">Số tiền cược:</label>
-    <input type="number" id="betAmount" min="1" value="100">
+        <label for="betAmount">Số tiền cược:</label>
+        <input type="number" id="betAmount" min="1" value="100">
 
-    <p>Chọn cược:</p>
-    <button onclick="playGame('Tài')">Tài</button>
-    <button onclick="playGame('Xỉu')">Xỉu</button>
+        <p>Chọn cược:</p>
+        <button class="btn btn-tai" onclick="playGame('Tài')">Tài</button>
+        <button class="btn btn-xiu" onclick="playGame('Xỉu')">Xỉu</button>
 
-    <p id="dice1" class="dice">🎲</p>
-    <p id="dice2" class="dice">🎲</p>
-    <p id="dice3" class="dice">🎲</p>
+        <p id="dice1" class="dice">🎲</p>
+        <p id="dice2" class="dice">🎲</p>
+        <p id="dice3" class="dice">🎲</p>
 
-    <p id="resultText"></p>
+        <p id="resultText"></p>
+    </div>
 
     <script>
         let balance = 1000;
@@ -47,15 +90,13 @@
             let total = dice1 + dice2 + dice3;
             let result = (total >= 11) ? "Tài" : "Xỉu";
 
-            // Chỉ cho phép người chơi thắng 10% xác suất
-            let winChance = Math.random() < 0.10;  // Xác suất thắng 10%
-
             document.getElementById("dice1").textContent = `🎲${dice1}`;
             document.getElementById("dice2").textContent = `🎲${dice2}`;
             document.getElementById("dice3").textContent = `🎲${dice3}`;
             document.getElementById("resultText").textContent = `Tổng: ${total} -> ${result}`;
 
-            if (winChance && choice === result) {
+            let winChance = Math.random() < 0.30; // Xác suất thắng 30%
+            if ((winChance && choice === result) || (!winChance && choice !== result)) {
                 balance += bet;
                 alert("Bạn đã thắng!");
             } else {
