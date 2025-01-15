@@ -54,7 +54,7 @@
 
     <div class="container">
         <h1>Game Tài Xỉu</h1>
-        <p>Số dư: <span id="balance">1000</span> VNĐ</p>
+        <p>Số dư: <span id="balance">10000000</span> VNĐ</p>
 
         <label for="betAmount">Số tiền cược:</label>
         <input type="number" id="betAmount" min="1" value="100">
@@ -70,47 +70,47 @@
         <p id="resultText"></p>
     </div>
 
-    <script>
-        let balance = 1000;
+<script>
+    let balance = 1000;
 
-        function rollDice() {
-            return Math.floor(Math.random() * 6) + 1;
+    function rollDice() {
+        return Math.floor(Math.random() * 6) + 1;
+    }
+
+    function playGame(choice) {
+        let bet = parseInt(document.getElementById("betAmount").value);
+        if (bet > balance || bet <= 0) {
+            alert("Số tiền cược không hợp lệ!");
+            return;
         }
 
-        function playGame(choice) {
-            let bet = parseInt(document.getElementById("betAmount").value);
-            if (bet > balance || bet <= 0) {
-                alert("Số tiền cược không hợp lệ!");
-                return;
-            }
+        let dice1 = rollDice();
+        let dice2 = rollDice();
+        let dice3 = rollDice();
+        let total = dice1 + dice2 + dice3;
 
-            let dice1 = rollDice();
-            let dice2 = rollDice();
-            let dice3 = rollDice();
-            let total = dice1 + dice2 + dice3;
-            let result = (total >= 11) ? "Tài" : "Xỉu";
+        document.getElementById("dice1").textContent = `🎲${dice1}`;
+        document.getElementById("dice2").textContent = `🎲${dice2}`;
+        document.getElementById("dice3").textContent = `🎲${dice3}`;
+        document.getElementById("resultText").textContent = `Tổng: ${total}`;
 
-            document.getElementById("dice1").textContent = `🎲${dice1}`;
-            document.getElementById("dice2").textContent = `🎲${dice2}`;
-            document.getElementById("dice3").textContent = `🎲${dice3}`;
-            document.getElementById("resultText").textContent = `Tổng: ${total} -> ${result}`;
-
-            let winChance = Math.random() < 0.30; // Xác suất thắng 30%
-            if ((winChance && choice === result) || (!winChance && choice !== result)) {
-                balance += bet;
-                alert("Bạn đã thắng!");
-            } else {
-                balance -= bet;
-                alert("Bạn đã thua!");
-            }
-
-            document.getElementById("balance").textContent = balance;
-
-            if (balance <= 0) {
-                alert("Bạn đã hết tiền! Game over.");
-            }
+        // Kiểm tra thắng/thua dựa trên quy tắc mới
+        if ((choice === "Xỉu" && total >= 1 && total <= 10) || 
+            (choice === "Tài" && total >= 11 && total <= 16)) {
+            balance += bet;
+            alert("Bạn đã thắng!");
+        } else {
+            balance -= bet;
+            alert("Bạn đã thua!");
         }
-    </script>
+
+        document.getElementById("balance").textContent = balance;
+
+        if (balance <= 0) {
+            alert("Bạn đã hết tiền! Game over.");
+        }
+    }
+</script>
 
 </body>
 </html>
