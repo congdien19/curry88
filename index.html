@@ -1,369 +1,150 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-    <title>Game Tài Xỉu</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <meta charset="UTF-8">
+    <title>Game Tài Xỉu - Tỷ lệ thắng 40%</title>
     <style>
         body {
-            background-color: #000;
-            color: #fff;
-        }
-
-        .dice-icon {
-            font-size: 60px;
-            display: inline-block;
-            width: 70px;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
             text-align: center;
+            padding: 20px;
         }
-
-        .result {
-            font-size: 20px;
-            font-weight: bold;
-            white-space: pre-line;
+        .dice {
+            font-size: 80px;
+            margin: 10px;
         }
-
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .user-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 2px solid white;
-        }
-
-        .btn-nap {
-            margin-left: 10px;
-        }
-
-        .form-control,
-        .form-select {
-            background-color: #222;
-            color: #fff;
-            border: 1px solid #444;
-        }
-
-        .form-control::placeholder {
-            color: #aaa;
-        }
-
-        .list-group-item {
-            background-color: #222;
-            color: #fff;
-            border-color: #444;
-        }
-
-        .btn-success {
-            background-color: #28a745;
-            border-color: #28a745;
-        }
-
-        .btn-warning {
-            background-color: #ffc107;
-            color: #000;
-        }
-
-        .btn-warning:hover {
-            background-color: #e0a800;
-        }
-
-        .btn-success:hover {
-            background-color: #218838;
-        }
-
-        .btn-danger {
-            background-color: #dc3545;
-            border-color: #dc3545;
-        }
-
-        .btn-danger:hover {
-            background-color: #c82333;
-        }
-
-        #gameContainer, #registerContainer {
-            display: none;
-        }
-
-        .auth-container {
-            max-width: 400px;
-            margin: 100px auto;
-        }
-
-        .toggle-auth {
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
             cursor: pointer;
-            color: #0d6efd;
         }
-
-        .toggle-auth:hover {
-            text-decoration: underline;
+        #gameResult {
+            margin-top: 20px;
+            font-size: 20px;
+            white-space: pre-line;
         }
     </style>
 </head>
 <body>
+    <h1>🎲 Game Tài Xỉu 🎲</h1>
 
-<!-- Đăng nhập -->
-<div id="loginContainer" class="auth-container text-center">
-    <h2>Đăng nhập</h2>
-    <input id="loginUsername" type="text" class="form-control mb-3" placeholder="Tên tài khoản">
-    <input id="loginPassword" type="password" class="form-control mb-3" placeholder="Mật khẩu">
-    <button class="btn btn-primary w-100" onclick="dangNhap()">Đăng nhập</button>
-    <p class="mt-3">Chưa có tài khoản? <span class="toggle-auth" onclick="hienDangKy()">Đăng ký</span></p>
-</div>
+    <p>Số dư: <span id="soDu">1000</span>💰</p>
 
-<!-- Đăng ký -->
-<div id="registerContainer" class="auth-container text-center">
-    <h2>Đăng ký</h2>
-    <input id="regUsername" type="text" class="form-control mb-3" placeholder="Tên tài khoản">
-    <input id="regPassword" type="password" class="form-control mb-3" placeholder="Mật khẩu">
-    <button class="btn btn-success w-100" onclick="dangKy()">Đăng ký</button>
-    <p class="mt-3">Đã có tài khoản? <span class="toggle-auth" onclick="hienDangNhap()">Đăng nhập</span></p>
-</div>
+    <label for="cuocChon">Chọn cược:</label>
+    <select id="cuocChon">
+        <option value="tai">Tài (11-17)</option>
+        <option value="xiu">Xỉu (4-10)</option>
+    </select>
 
-<!-- Game -->
-<div id="gameContainer" class="container py-5">
-    <div class="top-bar">
-        <h1 class="text-center">🎲 Game Tài Xỉu - Curry88</h1>
-        <div>
-            <span id="welcomeUser" class="me-3"></span>
-            <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="User" class="user-icon">
-            <button class="btn btn-danger btn-sm ms-2" onclick="dangXuat()">Đăng xuất</button>
-        </div>
+    <br><br>
+
+    <label for="tienCuoc">Tiền cược:</label>
+    <input type="number" id="tienCuoc" placeholder="Nhập số tiền" />
+
+    <br><br>
+
+    <button id="btnQuay" onclick="choiTaiXiu()">Quay</button>
+
+    <div style="margin-top: 20px;">
+        <span class="dice" id="dice1">🎲</span>
+        <span class="dice" id="dice2">🎲</span>
+        <span class="dice" id="dice3">🎲</span>
     </div>
 
-    <div class="row mb-4 justify-content-center">
-        <div class="col-md-6">
-            <label for="tienCuoc">Số tiền cược:</label>
-            <input type="number" id="tienCuoc" class="form-control" placeholder="Nhập số tiền...">
-        </div>
-        <div class="col-md-6">
-            <label for="cuocChon">Chọn cược:</label>
-            <select id="cuocChon" class="form-select">
-                <option value="tai">Tài</option>
-                <option value="xiu">Xỉu</option>
-            </select>
-        </div>
-    </div>
+    <div id="gameResult"></div>
+    <div id="countdown"></div>
 
-    <div class="text-center mb-3">
-        <button id="btnQuay" class="btn btn-success btn-lg" onclick="choiTaiXiu()">Quay</button>
-        <p id="countdown" class="mt-2 text-warning"></p>
-    </div>
+    <script>
+        let soDu = 1000;
+        const diceUnicode = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
 
-    <div class="text-center">
-        <span id="dice1" class="dice-icon me-2">🎲</span>
-        <span id="dice2" class="dice-icon me-2">🎲</span>
-        <span id="dice3" class="dice-icon">🎲</span>
-        <div id="gameResult" class="result mt-3"></div>
-    </div>
-
-    <div class="mt-4 d-flex align-items-center">
-        <h4 class="mb-0">Số dư: <span id="soDu">1000</span> 💰</h4>
-        <button class="btn btn-warning btn-sm btn-nap" onclick="napTien()">Nạp tiền</button>
-        <button class="btn btn-danger btn-sm btn-nap" onclick="rutTien()">Rút tiền</button>
-    </div>
-
-    <div class="mt-3">
-        <h5>Lịch sử:</h5>
-        <ul id="lichSu" class="list-group text-light"></ul>
-    </div>
-</div>
-
-<script>
-    let soDu = 1000;
-    const diceUnicode = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
-
-    function hienDangKy() {
-        document.getElementById("loginContainer").style.display = "none";
-        document.getElementById("registerContainer").style.display = "block";
-    }
-
-    function hienDangNhap() {
-        document.getElementById("loginContainer").style.display = "block";
-        document.getElementById("registerContainer").style.display = "none";
-    }
-
-    function dangKy() {
-        const user = document.getElementById("regUsername").value.trim();
-        const pass = document.getElementById("regPassword").value;
-
-        if (!user || !pass) return alert("Vui lòng điền đầy đủ thông tin!");
-
-        if (localStorage.getItem("user_" + user)) {
-            return alert("Tài khoản đã tồn tại!");
+        function capNhatSoDu() {
+            document.getElementById("soDu").innerText = soDu;
         }
 
-        localStorage.setItem("user_" + user, JSON.stringify({ password: pass }));
-        alert("Đăng ký thành công, hãy đăng nhập.");
-        hienDangNhap();
-    }
-
-    function dangNhap() {
-        const user = document.getElementById("loginUsername").value.trim();
-        const pass = document.getElementById("loginPassword").value;
-
-        const saved = localStorage.getItem("user_" + user);
-        if (!saved) return alert("Tài khoản không tồn tại!");
-
-        const data = JSON.parse(saved);
-        if (data.password !== pass) return alert("Sai mật khẩu!");
-
-        sessionStorage.setItem("username", user);
-        hienThiGameTheoDangNhap();
-    }
-
-    function dangXuat() {
-        sessionStorage.removeItem("username");
-        alert("Đã đăng xuất.");
-        hienDangNhap();
-        document.getElementById("gameContainer").style.display = "none";
-    }
-
-    function hienThiGameTheoDangNhap() {
-        const username = sessionStorage.getItem("username");
-        if (username) {
-            document.getElementById("loginContainer").style.display = "none";
-            document.getElementById("registerContainer").style.display = "none";
-            document.getElementById("gameContainer").style.display = "block";
-            document.getElementById("welcomeUser").innerText = `Xin chào, ${username}!`;
-
-            const savedBalance = localStorage.getItem(username + "_balance");
-            if (savedBalance !== null) soDu = parseInt(savedBalance);
-
-            capNhatSoDu();
-            loadLichSu();
+        function demNguoc() {
+            let dem = 5;
+            const countdown = document.getElementById("countdown");
+            const interval = setInterval(() => {
+                countdown.innerText = `⏳ Chờ ${dem}s để quay tiếp...`;
+                dem--;
+                if (dem < 0) {
+                    clearInterval(interval);
+                    countdown.innerText = "";
+                    document.getElementById("btnQuay").disabled = false;
+                }
+            }, 1000);
         }
-    }
 
-    function capNhatSoDu() {
-        document.getElementById("soDu").innerText = soDu;
-        const username = sessionStorage.getItem("username");
-        if (username) localStorage.setItem(username + "_balance", soDu);
-    }
+        function rollAnimation(callback) {
+            let count = 10;
+            const interval = setInterval(() => {
+                document.getElementById("dice1").textContent = diceUnicode[Math.floor(Math.random() * 6)];
+                document.getElementById("dice2").textContent = diceUnicode[Math.floor(Math.random() * 6)];
+                document.getElementById("dice3").textContent = diceUnicode[Math.floor(Math.random() * 6)];
+                count--;
+                if (count <= 0) {
+                    clearInterval(interval);
+                    callback();
+                }
+            }, 100);
+        }
 
-    function capNhatLichSu(tien, luaChon, tong, ketQua) {
-        const username = sessionStorage.getItem("username");
-        if (!username) return;
-        let lichSuArr = JSON.parse(localStorage.getItem(username + "_lichSu")) || [];
-        const item = `💵 Đặt ${tien} vào ${luaChon.toUpperCase()} → Tổng ${tong} → ${ketQua}`;
-        lichSuArr.unshift(item);
-        if (lichSuArr.length > 20) lichSuArr.pop();
-        localStorage.setItem(username + "_lichSu", JSON.stringify(lichSuArr));
-        loadLichSu();
-    }
+        function choiTaiXiu() {
+            const datCuoc = document.getElementById("cuocChon").value;
+            const tienCuoc = parseInt(document.getElementById("tienCuoc").value);
 
-    function loadLichSu() {
-        const username = sessionStorage.getItem("username");
-        if (!username) return;
-        let lichSuArr = JSON.parse(localStorage.getItem(username + "_lichSu")) || [];
-        const lichSuList = document.getElementById("lichSu");
-        lichSuList.innerHTML = "";
-        lichSuArr.forEach(text => {
-            const li = document.createElement("li");
-            li.className = "list-group-item";
-            li.textContent = text;
-            lichSuList.appendChild(li);
-        });
-    }
+            if (!tienCuoc || tienCuoc <= 0) return alert("Số tiền cược không hợp lệ.");
+            if (tienCuoc > soDu) return alert("Không đủ tiền để cược.");
 
-    function demNguoc() {
-        let time = 3;
-        const interval = setInterval(() => {
-            document.getElementById("countdown").innerText = `⏳ Đợi ${time--}s để chơi tiếp...`;
-            if (time < 0) {
-                clearInterval(interval);
-                document.getElementById("btnQuay").disabled = false;
-                document.getElementById("countdown").innerText = "";
-            }
-        }, 1000);
-    }
+            document.getElementById("btnQuay").disabled = true;
+            document.getElementById("gameResult").innerText = "";
+            document.getElementById("countdown").innerText = "";
 
-    function rollAnimation(callback) {
-        let count = 0;
-        const interval = setInterval(() => {
-            document.getElementById("dice1").textContent = diceUnicode[Math.floor(Math.random() * 6)];
-            document.getElementById("dice2").textContent = diceUnicode[Math.floor(Math.random() * 6)];
-            document.getElementById("dice3").textContent = diceUnicode[Math.floor(Math.random() * 6)];
-            count++;
-            if (count >= 15) {
-                clearInterval(interval);
-                callback();
-            }
-        }, 100);
-    }
+            rollAnimation(() => {
+                const win = Math.random() < 0.4; // 40% thắng
+                let x1, x2, x3, tong, ketQua;
 
-    function choiTaiXiu() {
-        const datCuoc = document.getElementById("cuocChon").value;
-        const tienCuoc = parseInt(document.getElementById("tienCuoc").value);
+                if (win) {
+                    do {
+                        x1 = Math.floor(Math.random() * 6) + 1;
+                        x2 = Math.floor(Math.random() * 6) + 1;
+                        x3 = Math.floor(Math.random() * 6) + 1;
+                        tong = x1 + x2 + x3;
+                        ketQua = (tong >= 4 && tong <= 10) ? "xiu" : "tai";
+                    } while (ketQua !== datCuoc);
+                } else {
+                    do {
+                        x1 = Math.floor(Math.random() * 6) + 1;
+                        x2 = Math.floor(Math.random() * 6) + 1;
+                        x3 = Math.floor(Math.random() * 6) + 1;
+                        tong = x1 + x2 + x3;
+                        ketQua = (tong >= 4 && tong <= 10) ? "xiu" : "tai";
+                    } while (ketQua === datCuoc);
+                }
 
-        if (!tienCuoc || tienCuoc <= 0) return alert("Số tiền cược không hợp lệ.");
-        if (tienCuoc > soDu) return alert("Không đủ tiền để cược.");
+                document.getElementById("dice1").textContent = diceUnicode[x1 - 1];
+                document.getElementById("dice2").textContent = diceUnicode[x2 - 1];
+                document.getElementById("dice3").textContent = diceUnicode[x3 - 1];
 
-        document.getElementById("btnQuay").disabled = true;
-        document.getElementById("gameResult").innerText = "";
-        document.getElementById("countdown").innerText = "";
+                let ketQuaText = `Tổng: ${tong} → ${ketQua.toUpperCase()}`;
 
-        rollAnimation(() => {
-            const x1 = Math.floor(Math.random() * 6) + 1;
-            const x2 = Math.floor(Math.random() * 6) + 1;
-            const x3 = Math.floor(Math.random() * 6) + 1;
+                if (ketQua === datCuoc) {
+                    soDu += tienCuoc;
+                    ketQuaText += `\n✅ Bạn đã thắng +${tienCuoc}💰`;
+                } else {
+                    soDu -= tienCuoc;
+                    ketQuaText += `\n❌ Bạn đã thua -${tienCuoc}💰`;
+                }
 
-            document.getElementById("dice1").textContent = diceUnicode[x1 - 1];
-            document.getElementById("dice2").textContent = diceUnicode[x2 - 1];
-            document.getElementById("dice3").textContent = diceUnicode[x3 - 1];
+                document.getElementById("gameResult").innerText = ketQuaText;
+                capNhatSoDu();
+                demNguoc();
 
-            const tong = x1 + x2 + x3;
-            const ketQua = (tong >= 4 && tong <= 10) ? "xiu" : "tai";
-            let ketQuaText = `Tổng: ${tong} → ${ketQua.toUpperCase()}`;
-
-            if (ketQua === datCuoc) {
-                soDu += tienCuoc;
-                ketQuaText += `\n✅ Bạn đã thắng +${tienCuoc}💰`;
-            } else {
-                soDu -= tienCuoc;
-                ketQuaText += `\n❌ Bạn đã thua -${tienCuoc}💰`;
-            }
-
-            document.getElementById("gameResult").innerText = ketQuaText;
-            capNhatSoDu();
-            capNhatLichSu(tienCuoc, datCuoc, tong, ketQuaText);
-            demNguoc();
-
-            document.getElementById("tienCuoc").value = '';
-        });
-    }
-
-    function napTien() {
-        const themTien = prompt("Nhập số tiền muốn nạp:");
-        const soTien = parseInt(themTien);
-        if (!soTien || soTien <= 0) return alert("Số tiền không hợp lệ.");
-        soDu += soTien;
-        capNhatSoDu();
-        alert(`🎉 Nạp thành công ${soTien}💰!`);
-    }
-
-    function rutTien() {
-        const rut = prompt("Nhập số tiền muốn rút:");
-        const soTien = parseInt(rut);
-        if (!soTien || soTien <= 0) return alert("Số tiền không hợp lệ.");
-        if (soTien > soDu) return alert("Không đủ tiền để rút.");
-
-        const taiKhoan = prompt("Nhập số tài khoản nhận tiền:");
-        if (!taiKhoan || taiKhoan.trim() === "") return alert("Bạn phải nhập số tài khoản!");
-
-        soDu -= soTien;
-        capNhatSoDu();
-        alert(`💸 Rút thành công ${soTien}💰 vào TK ${taiKhoan}!`);
-    }
-
-    window.onload = () => {
-        const username = sessionStorage.getItem("username");
-        if (username) hienThiGameTheoDangNhap();
-        else hienDangNhap();
-    }
-</script>
+                document.getElementById("tienCuoc").value = '';
+            });
+        }
+    </script>
 </body>
 </html>
