@@ -15,6 +15,28 @@
             max-width: 600px;
             margin-top: 30px;
         }
+        .cau-container {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        .cau-item {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 25px;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+        }
+        .cau-tai {
+            background-color: green;
+        }
+        .cau-xiu {
+            background-color: red;
+        }
     </style>
 </head>
 <body>
@@ -74,6 +96,9 @@
             </div>
         </div>
         <button onclick="choiTaiXiu()" class="btn btn-primary w-100">Quay Xúc Xắc 🎲</button>
+
+        <!-- Xem cầu -->
+        <div class="cau-container" id="xemCau"></div>
 
         <div class="text-center my-3">
             <div class="dice" id="dice1">⚀</div>
@@ -141,6 +166,7 @@
             if (savedBalance !== null) soDu = parseInt(savedBalance);
             capNhatSoDu();
             loadLichSu();
+            loadCau();
         }
     }
 
@@ -158,7 +184,9 @@
         lichSuArr.unshift(item);
         if (lichSuArr.length > 20) lichSuArr.pop();
         localStorage.setItem(username + "_lichSu", JSON.stringify(lichSuArr));
-        loadLichSu();
+
+        // Hiện sau 5 giây
+        setTimeout(loadLichSu, 5000);
     }
 
     function loadLichSu() {
@@ -172,6 +200,30 @@
             li.className = "list-group-item";
             li.innerText = item;
             lichSuEl.appendChild(li);
+        });
+    }
+
+    function capNhatCau(ketQua) {
+        const username = sessionStorage.getItem("username");
+        if (!username) return;
+        let cauArr = JSON.parse(localStorage.getItem(username + "_cau")) || [];
+        cauArr.unshift(ketQua);
+        if (cauArr.length > 20) cauArr.pop();
+        localStorage.setItem(username + "_cau", JSON.stringify(cauArr));
+        loadCau();
+    }
+
+    function loadCau() {
+        const username = sessionStorage.getItem("username");
+        if (!username) return;
+        let cauArr = JSON.parse(localStorage.getItem(username + "_cau")) || [];
+        const xemCau = document.getElementById("xemCau");
+        xemCau.innerHTML = "";
+        cauArr.forEach(kq => {
+            const div = document.createElement("div");
+            div.className = "cau-item " + (kq === "tai" ? "cau-tai" : "cau-xiu");
+            div.innerText = kq === "tai" ? "T" : "X";
+            xemCau.appendChild(div);
         });
     }
 
@@ -203,6 +255,7 @@
         document.getElementById("gameResult").innerText = ketQuaText;
         capNhatSoDu();
         capNhatLichSu(tien, luaChon, tong, ketQua);
+        capNhatCau(ketQua);
     }
 
     function napTien() {
