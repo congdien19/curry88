@@ -10,6 +10,8 @@
         }
         .dice {
             font-size: 50px;
+            display: inline-block;
+            margin: 0 10px;
         }
         .container {
             max-width: 600px;
@@ -97,7 +99,6 @@
         </div>
         <button onclick="choiTaiXiu()" class="btn btn-primary w-100">Quay Xúc Xắc 🎲</button>
 
-        <!-- Xem cầu -->
         <div class="cau-container" id="xemCau"></div>
 
         <div class="text-center my-3">
@@ -184,9 +185,7 @@
         lichSuArr.unshift(item);
         if (lichSuArr.length > 20) lichSuArr.pop();
         localStorage.setItem(username + "_lichSu", JSON.stringify(lichSuArr));
-
-        // Hiện sau 5 giây
-        setTimeout(loadLichSu, 5000);
+        setTimeout(loadLichSu, 500);
     }
 
     function loadLichSu() {
@@ -243,43 +242,38 @@
         document.getElementById("dice2").innerText = diceUnicode[dice2 - 1];
         document.getElementById("dice3").innerText = diceUnicode[dice3 - 1];
 
-        let ketQuaText = `Tổng: ${tong}\nKết quả: ${ketQua.toUpperCase()}`;
         if (luaChon === ketQua) {
             soDu += tien;
-            ketQuaText += `\n🎉 Bạn thắng ${tien} 💰`;
+            document.getElementById("gameResult").innerText = `🎉 Thắng! Tổng ${tong} là ${ketQua.toUpperCase()}.`;
         } else {
             soDu -= tien;
-            ketQuaText += `\n💥 Bạn thua ${tien} 💸`;
+            document.getElementById("gameResult").innerText = `💥 Thua! Tổng ${tong} là ${ketQua.toUpperCase()}.`;
         }
 
-        document.getElementById("gameResult").innerText = ketQuaText;
         capNhatSoDu();
         capNhatLichSu(tien, luaChon, tong, ketQua);
         capNhatCau(ketQua);
     }
 
     function napTien() {
-        let soTien = prompt("Nhập số tiền muốn nạp:");
-        soTien = parseInt(soTien);
-        if (soTien > 0) {
-            soDu += soTien;
+        const amount = prompt("Nhập số tiền muốn nạp:");
+        if (amount && !isNaN(amount) && amount > 0) {
+            soDu += parseInt(amount);
             capNhatSoDu();
-            alert(`Đã nạp ${soTien} thành công!`);
         }
     }
 
     function rutTien() {
-        let soTien = prompt("Nhập số tiền muốn rút:");
-        soTien = parseInt(soTien);
-        if (soTien > 0 && soTien <= soDu) {
-            soDu -= soTien;
+        const amount = prompt("Nhập số tiền muốn rút:");
+        if (amount && !isNaN(amount) && amount > 0 && amount <= soDu) {
+            soDu -= parseInt(amount);
             capNhatSoDu();
-            alert(`Đã rút ${soTien} thành công!`);
         } else {
-            alert("Số tiền không hợp lệ hoặc không đủ số dư!");
+            alert("Số tiền rút không hợp lệ!");
         }
     }
 
+    // Auto đăng nhập nếu có phiên
     window.onload = hienThiGameTheoDangNhap;
 </script>
 </body>
