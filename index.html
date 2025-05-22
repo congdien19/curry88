@@ -4,7 +4,10 @@
     <title>Game Tài Xỉu - Java Web</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
-
+        body {
+            background-color: #000;
+            color: #fff;
+        }
 
         .dice-icon {
             font-size: 60px;
@@ -36,15 +39,55 @@
             margin-left: 10px;
         }
 
+        .form-control,
+        .form-select {
+            background-color: #222;
+            color: #fff;
+            border: 1px solid #444;
+        }
+
+        .form-control::placeholder {
+            color: #aaa;
+        }
+
         .list-group-item {
-            background-color: #f8f9fa;
+            background-color: #222;
+            color: #fff;
+            border-color: #444;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+        .btn-warning {
+            background-color: #ffc107;
+            color: #000;
+        }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
         }
     </style>
 </head>
 <body>
 <div class="container py-5">
     <div class="top-bar">
-        <h1 class="text-center">🎲 Game Tài Xỉu-Curry88</h1>
+        <h1 class="text-center">🎲 Game Tài Xỉu - Curry88</h1>
         <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="User" class="user-icon">
     </div>
 
@@ -77,11 +120,12 @@
     <div class="mt-4 d-flex align-items-center">
         <h4 class="mb-0">Số dư: <span id="soDu">1000</span> 💰</h4>
         <button class="btn btn-warning btn-sm btn-nap" onclick="napTien()">Nạp tiền</button>
+        <button class="btn btn-danger btn-sm btn-nap" onclick="rutTien()">Rút tiền</button>
     </div>
 
     <div class="mt-3">
         <h5>Lịch sử:</h5>
-        <ul id="lichSu" class="list-group text-dark"></ul>
+        <ul id="lichSu" class="list-group text-light"></ul>
     </div>
 </div>
 
@@ -163,7 +207,6 @@
             capNhatLichSu(tienCuoc, datCuoc, tong, ketQuaText);
             demNguoc();
 
-            // ✅ Reset tiền cược về 0
             document.getElementById("tienCuoc").value = '';
         });
     }
@@ -175,6 +218,16 @@
         soDu += soTien;
         capNhatSoDu();
         alert(`🎉 Nạp thành công ${soTien}💰!`);
+    }
+
+    function rutTien() {
+        const rut = prompt("Nhập số tiền muốn rút:");
+        const soTien = parseInt(rut);
+        if (!soTien || soTien <= 0) return alert("Số tiền không hợp lệ.");
+        if (soTien > soDu) return alert("Không đủ tiền để rút.");
+        soDu -= soTien;
+        capNhatSoDu();
+        alert(`💸 Rút thành công ${soTien}💰!`);
     }
 </script>
 </body>
