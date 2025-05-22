@@ -1,10 +1,24 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html>
 <head>
     <title>Game Tài Xỉu - Java Web</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
+        body {
+            background-image: url('https://images.unsplash.com/photo-1551739440-9a25a812bde0'); /* Background liên quan cờ bạc */
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            color: white;
+            min-height: 100vh;
+        }
+
+        .bg-overlay {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 15px;
+        }
+
         .dice-icon {
             font-size: 60px;
             display: inline-block;
@@ -16,42 +30,49 @@
             font-size: 20px;
             font-weight: bold;
         }
+
+        .list-group-item {
+            background-color: white !important;
+            color: black;
+        }
     </style>
 </head>
-<body class="bg-dark text-white">
+<body>
 <div class="container py-5">
-    <h1 class="text-center mb-4">🎲 Game Tài Xỉu</h1>
+    <div class="bg-overlay">
+        <h1 class="text-center mb-4">🎲 Game Tài Xỉu</h1>
 
-    <div class="row mb-4 justify-content-center">
-        <div class="col-md-6">
-            <label for="tienCuoc">Số tiền cược:</label>
-            <input type="number" id="tienCuoc" class="form-control" placeholder="Nhập số tiền...">
+        <div class="row mb-4 justify-content-center">
+            <div class="col-md-6">
+                <label for="tienCuoc">Số tiền cược:</label>
+                <input type="number" id="tienCuoc" class="form-control" placeholder="Nhập số tiền..." value="0">
+            </div>
+            <div class="col-md-6">
+                <label for="cuocChon">Chọn cược:</label>
+                <select id="cuocChon" class="form-select">
+                    <option value="tai">Tài</option>
+                    <option value="xiu">Xỉu</option>
+                </select>
+            </div>
         </div>
-        <div class="col-md-6">
-            <label for="cuocChon">Chọn cược:</label>
-            <select id="cuocChon" class="form-select">
-                <option value="tai">Tài (11–17)</option>
-                <option value="xiu">Xỉu (4–10)</option>
-            </select>
+
+        <div class="text-center mb-3">
+            <button id="btnQuay" class="btn btn-success btn-lg" onclick="choiTaiXiu()">Quay</button>
+            <p id="countdown" class="mt-2 text-warning"></p>
         </div>
-    </div>
 
-    <div class="text-center mb-3">
-        <button id="btnQuay" class="btn btn-success btn-lg" onclick="choiTaiXiu()">Quay</button>
-        <p id="countdown" class="mt-2 text-warning"></p>
-    </div>
+        <div class="text-center">
+            <span id="dice1" class="dice-icon me-2">🎲</span>
+            <span id="dice2" class="dice-icon me-2">🎲</span>
+            <span id="dice3" class="dice-icon">🎲</span>
+            <div id="gameResult" class="result mt-3"></div>
+        </div>
 
-    <div class="text-center">
-        <span id="dice1" class="dice-icon me-2">🎲</span>
-        <span id="dice2" class="dice-icon me-2">🎲</span>
-        <span id="dice3" class="dice-icon">🎲</span>
-        <div id="gameResult" class="result mt-3"></div>
-    </div>
-
-    <div class="mt-4">
-        <h4>Số dư: <span id="soDu">1000</span> 💰</h4>
-        <h5 class="mt-3">Lịch sử:</h5>
-        <ul id="lichSu" class="list-group text-dark"></ul>
+        <div class="mt-4">
+            <h4>Số dư: <span id="soDu">1000</span> 💰</h4>
+            <h5 class="mt-3">Lịch sử:</h5>
+            <ul id="lichSu" class="list-group"></ul>
+        </div>
     </div>
 </div>
 
@@ -131,6 +152,7 @@
             document.getElementById("gameResult").innerText = ketQuaText;
             capNhatSoDu();
             capNhatLichSu(tienCuoc, datCuoc, tong, ketQuaText);
+            document.getElementById("tienCuoc").value = 0; // Reset số tiền cược
             demNguoc();
         });
     }
