@@ -19,6 +19,7 @@
         .result {
             font-size: 20px;
             font-weight: bold;
+            white-space: pre-line;
         }
 
         .top-bar {
@@ -82,13 +83,35 @@
         .btn-danger:hover {
             background-color: #c82333;
         }
+
+        #gameContainer {
+            display: none;
+        }
+
+        #loginContainer {
+            max-width: 400px;
+            margin: 100px auto;
+        }
     </style>
 </head>
 <body>
-<div class="container py-5">
+
+<!-- Đăng nhập -->
+<div id="loginContainer" class="container text-center">
+    <h2>Đăng nhập để chơi</h2>
+    <input id="inputUsername" type="text" class="form-control mb-3" placeholder="Nhập tên tài khoản">
+    <button class="btn btn-primary" onclick="dangNhap()">Đăng nhập</button>
+</div>
+
+<!-- Game -->
+<div id="gameContainer" class="container py-5">
     <div class="top-bar">
         <h1 class="text-center">🎲 Game Tài Xỉu - Curry88</h1>
-        <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="User" class="user-icon">
+        <div>
+            <span id="welcomeUser" class="me-3"></span>
+            <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="User" class="user-icon">
+            <button class="btn btn-danger btn-sm ms-2" onclick="dangXuat()">Đăng xuất</button>
+        </div>
     </div>
 
     <div class="row mb-4 justify-content-center">
@@ -130,20 +153,83 @@
 </div>
 
 <script>
+    // --- Khai báo biến ---
     let soDu = 1000;
     const diceUnicode = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
 
+    // --- Kiểm tra đăng nhập ---
+    function hienThiGameTheoDangNhap() {
+        const username = sessionStorage.getItem("username");
+        if (username) {
+            document.getElementById("loginContainer").style.display = "none";
+            document.getElementById("gameContainer").style.display = "block";
+            document.getElementById("welcomeUser").innerText = `Xin chào, ${username}!`;
+
+            // Load số dư và lịch sử từ localStorage theo user
+            const savedBalance = localStorage.getItem(username + "_balance");
+            if (savedBalance !== null) soDu = parseInt(savedBalance);
+
+            capNhatSoDu();
+            loadLichSu();
+        } else {
+            document.getElementById("loginContainer").style.display = "block";
+            document.getElementById("gameContainer").style.display = "none";
+        }
+    }
+
+    function dangNhap() {
+        const username = document.getElementById("inputUsername").value.trim();
+        if (!username) return alert("Vui lòng nhập tên tài khoản!");
+        sessionStorage.setItem("username", username);
+        hienThiGameTheoDangNhap();
+    }
+
+    function dangXuat() {
+        sessionStorage.removeItem("username");
+        alert("Bạn đã đăng xuất.");
+        hienThiGameTheoDangNhap();
+    }
+
+    // --- Cập nhật số dư ---
     function capNhatSoDu() {
         document.getElementById("soDu").innerText = soDu;
+        const username = sessionStorage.getItem("username");
+        if (username) {
+            localStorage.setItem(username + "_balance", soDu);
+        }
     }
 
+    // --- Cập nhật lịch sử ---
     function capNhatLichSu(tien, luaChon, tong, ketQua) {
-        const li = document.createElement("li");
-        li.className = "list-group-item";
-        li.innerText = `💵 Đặt ${tien} vào ${luaChon.toUpperCase()} → Tổng ${tong} → ${ketQua}`;
-        document.getElementById("lichSu").prepend(li);
+        const username = sessionStorage.getItem("username");
+        if (!username) return;
+
+        let lichSuArr = JSON.parse(localStorage.getItem(username + "_lichSu")) || [];
+
+        const item = `💵 Đặt ${tien} vào ${luaChon.toUpperCase()} → Tổng ${tong} → ${ketQua}`;
+        lichSuArr.unshift(item);
+        if (lichSuArr.length > 20) lichSuArr.pop(); // Giới hạn 20 mục lịch sử
+
+        localStorage.setItem(username + "_lichSu", JSON.stringify(lichSuArr));
+        loadLichSu();
     }
 
+    function loadLichSu() {
+        const username = sessionStorage.getItem("username");
+        if (!username) return;
+
+        let lichSuArr = JSON.parse(localStorage.getItem(username + "_lichSu")) || [];
+        const lichSuList = document.getElementById("lichSu");
+        lichSuList.innerHTML = "";
+        lichSuArr.forEach(text => {
+            const li = document.createElement("li");
+            li.className = "list-group-item";
+            li.textContent = text;
+            lichSuList.appendChild(li);
+        });
+    }
+
+    // --- Đếm ngược ---
     function demNguoc() {
         let time = 3;
         const interval = setInterval(() => {
@@ -156,6 +242,7 @@
         }, 1000);
     }
 
+    // --- Hiệu ứng quay xúc xắc ---
     function rollAnimation(callback) {
         let count = 0;
         const interval = setInterval(() => {
@@ -170,6 +257,7 @@
         }, 100);
     }
 
+    // --- Chơi tài xỉu ---
     function choiTaiXiu() {
         const datCuoc = document.getElementById("cuocChon").value;
         const tienCuoc = parseInt(document.getElementById("tienCuoc").value);
@@ -192,14 +280,14 @@
 
             const tong = x1 + x2 + x3;
             const ketQua = (tong >= 4 && tong <= 10) ? "xiu" : "tai";
-            let ketQuaText = `Tổng: ${tong} → ${ketQua.toUpperCase()}\n`;
+            let ketQuaText = `Tổng: ${tong} → ${ketQua.toUpperCase()}`;
 
             if (ketQua === datCuoc) {
                 soDu += tienCuoc;
-                ketQuaText += `✅ Bạn đã thắng +${tienCuoc}💰`;
+                ketQuaText += `\n✅ Bạn đã thắng +${tienCuoc}💰`;
             } else {
                 soDu -= tienCuoc;
-                ketQuaText += `❌ Bạn đã thua -${tienCuoc}💰`;
+                ketQuaText += `\n❌ Bạn đã thua -${tienCuoc}💰`;
             }
 
             document.getElementById("gameResult").innerText = ketQuaText;
@@ -211,6 +299,7 @@
         });
     }
 
+    // --- Nạp tiền ---
     function napTien() {
         const themTien = prompt("Nhập số tiền muốn nạp:");
         const soTien = parseInt(themTien);
@@ -220,14 +309,26 @@
         alert(`🎉 Nạp thành công ${soTien}💰!`);
     }
 
+    // --- Rút tiền ---
     function rutTien() {
         const rut = prompt("Nhập số tiền muốn rút:");
         const soTien = parseInt(rut);
         if (!soTien || soTien <= 0) return alert("Số tiền không hợp lệ.");
         if (soTien > soDu) return alert("Không đủ tiền để rút.");
+
+        const taiKhoan = prompt("Nhập số tài khoản nhận tiền:");
+        if (!taiKhoan || taiKhoan.trim() === "") {
+            return alert("Bạn phải nhập số tài khoản!");
+        }
+
         soDu -= soTien;
         capNhatSoDu();
-        alert(`💸 Rút thành công ${soTien}💰!`);
+        alert(`💸 Rút thành công ${soTien}💰 vào TK ${taiKhoan}!`);
+    }
+
+    // --- Khởi tạo khi tải trang ---
+    window.onload = () => {
+        hienThiGameTheoDangNhap();
     }
 </script>
 </body>
