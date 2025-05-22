@@ -84,23 +84,43 @@
             background-color: #c82333;
         }
 
-        #gameContainer {
+        #gameContainer, #registerContainer {
             display: none;
         }
 
-        #loginContainer {
+        .auth-container {
             max-width: 400px;
             margin: 100px auto;
+        }
+
+        .toggle-auth {
+            cursor: pointer;
+            color: #0d6efd;
+        }
+
+        .toggle-auth:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
 
 <!-- Đăng nhập -->
-<div id="loginContainer" class="container text-center">
-    <h2>Đăng nhập để chơi</h2>
-    <input id="inputUsername" type="text" class="form-control mb-3" placeholder="Nhập tên tài khoản">
-    <button class="btn btn-primary" onclick="dangNhap()">Đăng nhập</button>
+<div id="loginContainer" class="auth-container text-center">
+    <h2>Đăng nhập</h2>
+    <input id="loginUsername" type="text" class="form-control mb-3" placeholder="Tên tài khoản">
+    <input id="loginPassword" type="password" class="form-control mb-3" placeholder="Mật khẩu">
+    <button class="btn btn-primary w-100" onclick="dangNhap()">Đăng nhập</button>
+    <p class="mt-3">Chưa có tài khoản? <span class="toggle-auth" onclick="hienDangKy()">Đăng ký</span></p>
+</div>
+
+<!-- Đăng ký -->
+<div id="registerContainer" class="auth-container text-center">
+    <h2>Đăng ký</h2>
+    <input id="regUsername" type="text" class="form-control mb-3" placeholder="Tên tài khoản">
+    <input id="regPassword" type="password" class="form-control mb-3" placeholder="Mật khẩu">
+    <button class="btn btn-success w-100" onclick="dangKy()">Đăng ký</button>
+    <p class="mt-3">Đã có tài khoản? <span class="toggle-auth" onclick="hienDangNhap()">Đăng nhập</span></p>
 </div>
 
 <!-- Game -->
@@ -153,63 +173,84 @@
 </div>
 
 <script>
-    // --- Khai báo biến ---
     let soDu = 1000;
     const diceUnicode = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
 
-    // --- Kiểm tra đăng nhập ---
-    function hienThiGameTheoDangNhap() {
-        const username = sessionStorage.getItem("username");
-        if (username) {
-            document.getElementById("loginContainer").style.display = "none";
-            document.getElementById("gameContainer").style.display = "block";
-            document.getElementById("welcomeUser").innerText = `Xin chào, ${username}!`;
+    function hienDangKy() {
+        document.getElementById("loginContainer").style.display = "none";
+        document.getElementById("registerContainer").style.display = "block";
+    }
 
-            // Load số dư và lịch sử từ localStorage theo user
-            const savedBalance = localStorage.getItem(username + "_balance");
-            if (savedBalance !== null) soDu = parseInt(savedBalance);
+    function hienDangNhap() {
+        document.getElementById("loginContainer").style.display = "block";
+        document.getElementById("registerContainer").style.display = "none";
+    }
 
-            capNhatSoDu();
-            loadLichSu();
-        } else {
-            document.getElementById("loginContainer").style.display = "block";
-            document.getElementById("gameContainer").style.display = "none";
+    function dangKy() {
+        const user = document.getElementById("regUsername").value.trim();
+        const pass = document.getElementById("regPassword").value;
+
+        if (!user || !pass) return alert("Vui lòng điền đầy đủ thông tin!");
+
+        if (localStorage.getItem("user_" + user)) {
+            return alert("Tài khoản đã tồn tại!");
         }
+
+        localStorage.setItem("user_" + user, JSON.stringify({ password: pass }));
+        alert("Đăng ký thành công, hãy đăng nhập.");
+        hienDangNhap();
     }
 
     function dangNhap() {
-        const username = document.getElementById("inputUsername").value.trim();
-        if (!username) return alert("Vui lòng nhập tên tài khoản!");
-        sessionStorage.setItem("username", username);
+        const user = document.getElementById("loginUsername").value.trim();
+        const pass = document.getElementById("loginPassword").value;
+
+        const saved = localStorage.getItem("user_" + user);
+        if (!saved) return alert("Tài khoản không tồn tại!");
+
+        const data = JSON.parse(saved);
+        if (data.password !== pass) return alert("Sai mật khẩu!");
+
+        sessionStorage.setItem("username", user);
         hienThiGameTheoDangNhap();
     }
 
     function dangXuat() {
         sessionStorage.removeItem("username");
-        alert("Bạn đã đăng xuất.");
-        hienThiGameTheoDangNhap();
+        alert("Đã đăng xuất.");
+        hienDangNhap();
+        document.getElementById("gameContainer").style.display = "none";
     }
 
-    // --- Cập nhật số dư ---
-    function capNhatSoDu() {
-        document.getElementById("soDu").innerText = soDu;
+    function hienThiGameTheoDangNhap() {
         const username = sessionStorage.getItem("username");
         if (username) {
-            localStorage.setItem(username + "_balance", soDu);
+            document.getElementById("loginContainer").style.display = "none";
+            document.getElementById("registerContainer").style.display = "none";
+            document.getElementById("gameContainer").style.display = "block";
+            document.getElementById("welcomeUser").innerText = `Xin chào, ${username}!`;
+
+            const savedBalance = localStorage.getItem(username + "_balance");
+            if (savedBalance !== null) soDu = parseInt(savedBalance);
+
+            capNhatSoDu();
+            loadLichSu();
         }
     }
 
-    // --- Cập nhật lịch sử ---
+    function capNhatSoDu() {
+        document.getElementById("soDu").innerText = soDu;
+        const username = sessionStorage.getItem("username");
+        if (username) localStorage.setItem(username + "_balance", soDu);
+    }
+
     function capNhatLichSu(tien, luaChon, tong, ketQua) {
         const username = sessionStorage.getItem("username");
         if (!username) return;
-
         let lichSuArr = JSON.parse(localStorage.getItem(username + "_lichSu")) || [];
-
         const item = `💵 Đặt ${tien} vào ${luaChon.toUpperCase()} → Tổng ${tong} → ${ketQua}`;
         lichSuArr.unshift(item);
-        if (lichSuArr.length > 20) lichSuArr.pop(); // Giới hạn 20 mục lịch sử
-
+        if (lichSuArr.length > 20) lichSuArr.pop();
         localStorage.setItem(username + "_lichSu", JSON.stringify(lichSuArr));
         loadLichSu();
     }
@@ -217,7 +258,6 @@
     function loadLichSu() {
         const username = sessionStorage.getItem("username");
         if (!username) return;
-
         let lichSuArr = JSON.parse(localStorage.getItem(username + "_lichSu")) || [];
         const lichSuList = document.getElementById("lichSu");
         lichSuList.innerHTML = "";
@@ -229,7 +269,6 @@
         });
     }
 
-    // --- Đếm ngược ---
     function demNguoc() {
         let time = 3;
         const interval = setInterval(() => {
@@ -242,7 +281,6 @@
         }, 1000);
     }
 
-    // --- Hiệu ứng quay xúc xắc ---
     function rollAnimation(callback) {
         let count = 0;
         const interval = setInterval(() => {
@@ -257,7 +295,6 @@
         }, 100);
     }
 
-    // --- Chơi tài xỉu ---
     function choiTaiXiu() {
         const datCuoc = document.getElementById("cuocChon").value;
         const tienCuoc = parseInt(document.getElementById("tienCuoc").value);
@@ -299,7 +336,6 @@
         });
     }
 
-    // --- Nạp tiền ---
     function napTien() {
         const themTien = prompt("Nhập số tiền muốn nạp:");
         const soTien = parseInt(themTien);
@@ -309,7 +345,6 @@
         alert(`🎉 Nạp thành công ${soTien}💰!`);
     }
 
-    // --- Rút tiền ---
     function rutTien() {
         const rut = prompt("Nhập số tiền muốn rút:");
         const soTien = parseInt(rut);
@@ -317,18 +352,17 @@
         if (soTien > soDu) return alert("Không đủ tiền để rút.");
 
         const taiKhoan = prompt("Nhập số tài khoản nhận tiền:");
-        if (!taiKhoan || taiKhoan.trim() === "") {
-            return alert("Bạn phải nhập số tài khoản!");
-        }
+        if (!taiKhoan || taiKhoan.trim() === "") return alert("Bạn phải nhập số tài khoản!");
 
         soDu -= soTien;
         capNhatSoDu();
         alert(`💸 Rút thành công ${soTien}💰 vào TK ${taiKhoan}!`);
     }
 
-    // --- Khởi tạo khi tải trang ---
     window.onload = () => {
-        hienThiGameTheoDangNhap();
+        const username = sessionStorage.getItem("username");
+        if (username) hienThiGameTheoDangNhap();
+        else hienDangNhap();
     }
 </script>
 </body>
