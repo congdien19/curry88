@@ -1,143 +1,139 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Game Tài Xỉu</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-  <style>
-    body { background: #f7f7f7; padding-top: 40px; }
-    .dice { width: 60px; height: 60px; }
-    .result { font-size: 20px; font-weight: bold; margin-top: 10px; white-space: pre-line; }
-    #countdown { font-size: 20px; color: red; font-weight: bold; }
-    .history { font-size: 14px; margin-top: 10px; max-height: 150px; overflow-y: auto; }
-  </style>
+    <title>Game Tài Xỉu - Java Web</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .dice-icon {
+            font-size: 60px;
+            display: inline-block;
+            width: 70px;
+            text-align: center;
+        }
+
+        .result {
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
 </head>
-<body>
-<div class="container">
-  <h2 class="text-center mb-4">🎲 Game Tài Xỉu</h2>
+<body class="bg-dark text-white">
+<div class="container py-5">
+    <h1 class="text-center mb-4">🎲 Game Tài Xỉu</h1>
 
-  <div id="gameArea" class="card">
-    <div class="card-body">
-      <h5>Chào mừng! | Số dư: <span id="soDu">10000</span>💰</h5>
-
-      <div class="row mb-3">
-        <div class="col-6">
-          <select id="cuocChon" class="form-select">
-            <option value="tai">Tài (11-17)</option>
-            <option value="xiu">Xỉu (4-10)</option>
-          </select>
+    <div class="row mb-4 justify-content-center">
+        <div class="col-md-6">
+            <label for="tienCuoc">Số tiền cược:</label>
+            <input type="number" id="tienCuoc" class="form-control" placeholder="Nhập số tiền...">
         </div>
-        <div class="col-6">
-          <input type="number" id="tienCuoc" class="form-control" placeholder="Nhập số tiền cược">
+        <div class="col-md-6">
+            <label for="cuocChon">Chọn cược:</label>
+            <select id="cuocChon" class="form-select">
+                <option value="tai">Tài (11–17)</option>
+                <option value="xiu">Xỉu (4–10)</option>
+            </select>
         </div>
-      </div>
-
-      <button id="btnQuay" class="btn btn-warning w-100 mb-3" onclick="choiTaiXiu()">Quay xúc xắc</button>
-      <div id="countdown" class="text-center mb-3"></div>
-
-      <div class="text-center">
-        <img id="dice1" class="dice me-2" src="https://cdn.jsdelivr.net/gh/peachananr/dice@master/dice1.png">
-        <img id="dice2" class="dice me-2" src="https://cdn.jsdelivr.net/gh/peachananr/dice@master/dice2.png">
-        <img id="dice3" class="dice" src="https://cdn.jsdelivr.net/gh/peachananr/dice@master/dice3.png">
-        <div id="gameResult" class="result mt-3"></div>
-      </div>
-
-      <div class="history">
-        <strong>Lịch sử cược:</strong>
-        <ul id="lichSu" class="list-unstyled mt-2 mb-0"></ul>
-      </div>
     </div>
-  </div>
+
+    <div class="text-center mb-3">
+        <button id="btnQuay" class="btn btn-success btn-lg" onclick="choiTaiXiu()">Quay</button>
+        <p id="countdown" class="mt-2 text-warning"></p>
+    </div>
+
+    <div class="text-center">
+        <span id="dice1" class="dice-icon me-2">🎲</span>
+        <span id="dice2" class="dice-icon me-2">🎲</span>
+        <span id="dice3" class="dice-icon">🎲</span>
+        <div id="gameResult" class="result mt-3"></div>
+    </div>
+
+    <div class="mt-4">
+        <h4>Số dư: <span id="soDu">1000</span> 💰</h4>
+        <h5 class="mt-3">Lịch sử:</h5>
+        <ul id="lichSu" class="list-group text-dark"></ul>
+    </div>
 </div>
 
 <script>
-  let soDu = 10000;
-  const diceImgs = [
-    "https://cdn.jsdelivr.net/gh/peachananr/dice@master/dice1.png",
-    "https://cdn.jsdelivr.net/gh/peachananr/dice@master/dice2.png",
-    "https://cdn.jsdelivr.net/gh/peachananr/dice@master/dice3.png",
-    "https://cdn.jsdelivr.net/gh/peachananr/dice@master/dice4.png",
-    "https://cdn.jsdelivr.net/gh/peachananr/dice@master/dice5.png",
-    "https://cdn.jsdelivr.net/gh/peachananr/dice@master/dice6.png"
-  ];
+    let soDu = 1000;
+    const diceUnicode = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
 
-  function capNhatSoDu() {
-    document.getElementById("soDu").textContent = soDu;
-  }
+    function capNhatSoDu() {
+        document.getElementById("soDu").innerText = soDu;
+    }
 
-  function rollAnimation(callback) {
-    let count = 0;
-    const interval = setInterval(() => {
-      document.getElementById("dice1").src = diceImgs[Math.floor(Math.random() * 6)];
-      document.getElementById("dice2").src = diceImgs[Math.floor(Math.random() * 6)];
-      document.getElementById("dice3").src = diceImgs[Math.floor(Math.random() * 6)];
-      count++;
-      if (count >= 15) {
-        clearInterval(interval);
-        callback();
-      }
-    }, 100);
-  }
+    function capNhatLichSu(tien, luaChon, tong, ketQua) {
+        const li = document.createElement("li");
+        li.className = "list-group-item";
+        li.innerText = `💵 Đặt ${tien} vào ${luaChon.toUpperCase()} → Tổng ${tong} → ${ketQua}`;
+        document.getElementById("lichSu").prepend(li);
+    }
 
-  function choiTaiXiu() {
-    const datCuoc = document.getElementById("cuocChon").value;
-    const tienCuoc = parseInt(document.getElementById("tienCuoc").value);
+    function demNguoc() {
+        let time = 3;
+        const interval = setInterval(() => {
+            document.getElementById("countdown").innerText = `⏳ Đợi ${time--}s để chơi tiếp...`;
+            if (time < 0) {
+                clearInterval(interval);
+                document.getElementById("btnQuay").disabled = false;
+                document.getElementById("countdown").innerText = "";
+            }
+        }, 1000);
+    }
 
-    if (!tienCuoc || tienCuoc <= 0) return alert("Số tiền cược không hợp lệ.");
-    if (tienCuoc > soDu) return alert("Không đủ tiền để cược.");
+    function rollAnimation(callback) {
+        let count = 0;
+        const interval = setInterval(() => {
+            document.getElementById("dice1").textContent = diceUnicode[Math.floor(Math.random() * 6)];
+            document.getElementById("dice2").textContent = diceUnicode[Math.floor(Math.random() * 6)];
+            document.getElementById("dice3").textContent = diceUnicode[Math.floor(Math.random() * 6)];
+            count++;
+            if (count >= 15) {
+                clearInterval(interval);
+                callback();
+            }
+        }, 100);
+    }
 
-    document.getElementById("btnQuay").disabled = true;
-    document.getElementById("gameResult").innerText = "";
-    document.getElementById("countdown").innerText = "";
+    function choiTaiXiu() {
+        const datCuoc = document.getElementById("cuocChon").value;
+        const tienCuoc = parseInt(document.getElementById("tienCuoc").value);
 
-    rollAnimation(() => {
-      const x1 = Math.floor(Math.random() * 6) + 1;
-      const x2 = Math.floor(Math.random() * 6) + 1;
-      const x3 = Math.floor(Math.random() * 6) + 1;
+        if (!tienCuoc || tienCuoc <= 0) return alert("Số tiền cược không hợp lệ.");
+        if (tienCuoc > soDu) return alert("Không đủ tiền để cược.");
 
-      document.getElementById("dice1").src = diceImgs[x1 - 1];
-      document.getElementById("dice2").src = diceImgs[x2 - 1];
-      document.getElementById("dice3").src = diceImgs[x3 - 1];
+        document.getElementById("btnQuay").disabled = true;
+        document.getElementById("gameResult").innerText = "";
+        document.getElementById("countdown").innerText = "";
 
-      const tong = x1 + x2 + x3;
-      const ketQua = (tong >= 4 && tong <= 10) ? "xiu" : "tai";
-      let ketQuaText = `Tổng: ${tong} → ${ketQua.toUpperCase()}\n`;
+        rollAnimation(() => {
+            const x1 = Math.floor(Math.random() * 6) + 1;
+            const x2 = Math.floor(Math.random() * 6) + 1;
+            const x3 = Math.floor(Math.random() * 6) + 1;
 
-      if (ketQua === datCuoc) {
-        soDu += tienCuoc;
-        ketQuaText += `✅ Bạn đã thắng +${tienCuoc}💰`;
-      } else {
-        soDu -= tienCuoc;
-        ketQuaText += `❌ Bạn đã thua -${tienCuoc}💰`;
-      }
+            document.getElementById("dice1").textContent = diceUnicode[x1 - 1];
+            document.getElementById("dice2").textContent = diceUnicode[x2 - 1];
+            document.getElementById("dice3").textContent = diceUnicode[x3 - 1];
 
-      document.getElementById("gameResult").innerText = ketQuaText;
-      capNhatSoDu();
-      capNhatLichSu(tienCuoc, datCuoc, tong, ketQuaText);
-      demNguoc();
-    });
-  }
+            const tong = x1 + x2 + x3;
+            const ketQua = (tong >= 4 && tong <= 10) ? "xiu" : "tai";
+            let ketQuaText = `Tổng: ${tong} → ${ketQua.toUpperCase()}\n`;
 
-  function capNhatLichSu(tienCuoc, chon, tong, text) {
-    const lichSu = document.getElementById("lichSu");
-    const li = document.createElement("li");
-    li.textContent = `Cược ${chon.toUpperCase()} ${tienCuoc}💰 → ${text.replace(/\n/g, ' ')}`;
-    lichSu.prepend(li);
-  }
+            if (ketQua === datCuoc) {
+                soDu += tienCuoc;
+                ketQuaText += `✅ Bạn đã thắng +${tienCuoc}💰`;
+            } else {
+                soDu -= tienCuoc;
+                ketQuaText += `❌ Bạn đã thua -${tienCuoc}💰`;
+            }
 
-  function demNguoc() {
-    let time = 10;
-    const countdownEl = document.getElementById("countdown");
-    const interval = setInterval(() => {
-      countdownEl.innerText = `Ván mới bắt đầu sau ${time--}s...`;
-      if (time < 0) {
-        clearInterval(interval);
-        countdownEl.innerText = "";
-        document.getElementById("btnQuay").disabled = false;
-      }
-    }, 1000);
-  }
+            document.getElementById("gameResult").innerText = ketQuaText;
+            capNhatSoDu();
+            capNhatLichSu(tienCuoc, datCuoc, tong, ketQuaText);
+            demNguoc();
+        });
+    }
 </script>
 </body>
 </html>
