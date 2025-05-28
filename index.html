@@ -1,280 +1,101 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Game Tài Xỉu</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .dice {
-            font-size: 50px;
-            display: inline-block;
-            margin: 0 10px;
-        }
-        .container {
-            max-width: 600px;
-            margin-top: 30px;
-        }
-        .cau-container {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            margin-bottom: 10px;
-        }
-        .cau-item {
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 25px;
-            font-size: 14px;
-            font-weight: bold;
-            color: white;
-        }
-        .cau-tai {
-            background-color: green;
-        }
-        .cau-xiu {
-            background-color: red;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Dino Game</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: sans-serif;
+      background: #f7f7f7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    #game {
+      width: 800px;
+      height: 200px;
+      background: #fff;
+      border: 2px solid #333;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #dino {
+      width: 40px;
+      height: 40px;
+      background: green;
+      position: absolute;
+      bottom: 0;
+      left: 50px;
+    }
+
+    #cactus {
+      width: 20px;
+      height: 50px;
+      background: red;
+      position: absolute;
+      bottom: 0;
+      left: 800px;
+    }
+
+    .jump {
+      animation: jump 0.5s ease-out;
+    }
+
+    @keyframes jump {
+      0%   { bottom: 0; }
+      50%  { bottom: 100px; }
+      100% { bottom: 0; }
+    }
+  </style>
 </head>
 <body>
-<div class="container">
-    <h2 class="text-center mb-4">🎲 Game Tài Xỉu</h2>
+  <div id="game">
+    <div id="dino"></div>
+    <div id="cactus"></div>
+  </div>
 
-    <!-- Đăng nhập -->
-    <div id="loginContainer">
-        <div class="mb-3">
-            <label>Tài khoản:</label>
-            <input type="text" id="loginUsername" class="form-control">
-        </div>
-        <div class="mb-3">
-            <label>Mật khẩu:</label>
-            <input type="password" id="loginPassword" class="form-control">
-        </div>
-        <button onclick="dangNhap()" class="btn btn-primary">Đăng nhập</button>
-        <button onclick="hienDangKy()" class="btn btn-link">Đăng ký</button>
-    </div>
+  <script>
+    const dino = document.getElementById("dino");
+    const cactus = document.getElementById("cactus");
 
-    <!-- Đăng ký -->
-    <div id="registerContainer" style="display:none;">
-        <div class="mb-3">
-            <label>Tài khoản:</label>
-            <input type="text" id="regUsername" class="form-control">
-        </div>
-        <div class="mb-3">
-            <label>Mật khẩu:</label>
-            <input type="password" id="regPassword" class="form-control">
-        </div>
-        <button onclick="dangKy()" class="btn btn-success">Đăng ký</button>
-        <button onclick="hienDangNhap()" class="btn btn-link">Quay lại đăng nhập</button>
-    </div>
+    document.addEventListener("keydown", function (event) {
+      if (event.code === "Space" || event.code === "ArrowUp") {
+        jump();
+      }
+    });
 
-    <!-- Game -->
-    <div id="gameContainer" style="display:none;">
-        <div class="mb-3">
-            <strong id="welcomeUser"></strong>
-            <button onclick="dangXuat()" class="btn btn-danger btn-sm float-end">Đăng xuất</button>
-        </div>
-        <div class="mb-3">
-            <strong>Số dư:</strong> <span id="soDu">0</span> 💰
-            <button onclick="napTien()" class="btn btn-outline-success btn-sm ms-2">Nạp</button>
-            <button onclick="rutTien()" class="btn btn-outline-warning btn-sm ms-1">Rút</button>
-        </div>
-        <div class="row mb-3">
-            <div class="col">
-                <label>Chọn cược:</label>
-                <select id="cuocChon" class="form-select">
-                    <option value="tai">Tài</option>
-                    <option value="xiu">Xỉu</option>
-                </select>
-            </div>
-            <div class="col">
-                <label>Số tiền cược:</label>
-                <input type="number" id="tienCuoc" class="form-control">
-            </div>
-        </div>
-        <button onclick="choiTaiXiu()" class="btn btn-primary w-100">Quay Xúc Xắc 🎲</button>
-
-        <div class="cau-container" id="xemCau"></div>
-
-        <div class="text-center my-3">
-            <div class="dice" id="dice1">⚀</div>
-            <div class="dice" id="dice2">⚀</div>
-            <div class="dice" id="dice3">⚀</div>
-        </div>
-
-        <div class="alert alert-info" id="gameResult">Kết quả sẽ hiển thị ở đây</div>
-
-        <h5>Lịch sử cược:</h5>
-        <ul class="list-group" id="lichSu"></ul>
-    </div>
-</div>
-
-<script>
-    let soDu = 1000;
-    const diceUnicode = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
-
-    function hienDangKy() {
-        document.getElementById("loginContainer").style.display = "none";
-        document.getElementById("registerContainer").style.display = "block";
+    function jump() {
+      if (!dino.classList.contains("jump")) {
+        dino.classList.add("jump");
+        setTimeout(function () {
+          dino.classList.remove("jump");
+        }, 500);
+      }
     }
 
-    function hienDangNhap() {
-        document.getElementById("loginContainer").style.display = "block";
-        document.getElementById("registerContainer").style.display = "none";
-    }
+    let isAlive = setInterval(function () {
+      let dinoTop = parseInt(window.getComputedStyle(dino).getPropertyValue("top"));
+      let cactusLeft = parseInt(window.getComputedStyle(cactus).getPropertyValue("left"));
 
-    function dangKy() {
-        const user = document.getElementById("regUsername").value.trim();
-        const pass = document.getElementById("regPassword").value;
-        if (!user || !pass) return alert("Vui lòng điền đầy đủ thông tin!");
-        if (localStorage.getItem("user_" + user)) return alert("Tài khoản đã tồn tại!");
-        localStorage.setItem("user_" + user, JSON.stringify({ password: pass }));
-        alert("Đăng ký thành công, hãy đăng nhập.");
-        hienDangNhap();
-    }
+      if (cactusLeft < 90 && cactusLeft > 50 && dinoTop > 140) {
+        alert("Game Over!");
+        location.reload();
+      }
+    }, 10);
 
-    function dangNhap() {
-        const user = document.getElementById("loginUsername").value.trim();
-        const pass = document.getElementById("loginPassword").value;
-        const saved = localStorage.getItem("user_" + user);
-        if (!saved) return alert("Tài khoản không tồn tại!");
-        const data = JSON.parse(saved);
-        if (data.password !== pass) return alert("Sai mật khẩu!");
-        sessionStorage.setItem("username", user);
-        hienThiGameTheoDangNhap();
-    }
+    let moveCactus = setInterval(function () {
+      let cactusLeft = parseInt(window.getComputedStyle(cactus).getPropertyValue("left"));
 
-    function dangXuat() {
-        sessionStorage.removeItem("username");
-        alert("Đã đăng xuất.");
-        hienDangNhap();
-        document.getElementById("gameContainer").style.display = "none";
-    }
-
-    function hienThiGameTheoDangNhap() {
-        const username = sessionStorage.getItem("username");
-        if (username) {
-            document.getElementById("loginContainer").style.display = "none";
-            document.getElementById("registerContainer").style.display = "none";
-            document.getElementById("gameContainer").style.display = "block";
-            document.getElementById("welcomeUser").innerText = `Xin chào, ${username}!`;
-            const savedBalance = localStorage.getItem(username + "_balance");
-            if (savedBalance !== null) soDu = parseInt(savedBalance);
-            capNhatSoDu();
-            loadLichSu();
-            loadCau();
-        }
-    }
-
-    function capNhatSoDu() {
-        document.getElementById("soDu").innerText = soDu;
-        const username = sessionStorage.getItem("username");
-        if (username) localStorage.setItem(username + "_balance", soDu);
-    }
-
-    function capNhatLichSu(tien, luaChon, tong, ketQua) {
-        const username = sessionStorage.getItem("username");
-        if (!username) return;
-        let lichSuArr = JSON.parse(localStorage.getItem(username + "_lichSu")) || [];
-        const item = `💵 Đặt ${tien} vào ${luaChon.toUpperCase()} → Tổng ${tong} → ${ketQua.toUpperCase()}`;
-        lichSuArr.unshift(item);
-        if (lichSuArr.length > 20) lichSuArr.pop();
-        localStorage.setItem(username + "_lichSu", JSON.stringify(lichSuArr));
-        setTimeout(loadLichSu, 500);
-    }
-
-    function loadLichSu() {
-        const username = sessionStorage.getItem("username");
-        if (!username) return;
-        let lichSuArr = JSON.parse(localStorage.getItem(username + "_lichSu")) || [];
-        const lichSuEl = document.getElementById("lichSu");
-        lichSuEl.innerHTML = "";
-        lichSuArr.forEach(item => {
-            const li = document.createElement("li");
-            li.className = "list-group-item";
-            li.innerText = item;
-            lichSuEl.appendChild(li);
-        });
-    }
-
-    function capNhatCau(ketQua) {
-        const username = sessionStorage.getItem("username");
-        if (!username) return;
-        let cauArr = JSON.parse(localStorage.getItem(username + "_cau")) || [];
-        cauArr.unshift(ketQua);
-        if (cauArr.length > 20) cauArr.pop();
-        localStorage.setItem(username + "_cau", JSON.stringify(cauArr));
-        loadCau();
-    }
-
-    function loadCau() {
-        const username = sessionStorage.getItem("username");
-        if (!username) return;
-        let cauArr = JSON.parse(localStorage.getItem(username + "_cau")) || [];
-        const xemCau = document.getElementById("xemCau");
-        xemCau.innerHTML = "";
-        cauArr.forEach(kq => {
-            const div = document.createElement("div");
-            div.className = "cau-item " + (kq === "tai" ? "cau-tai" : "cau-xiu");
-            div.innerText = kq === "tai" ? "T" : "X";
-            xemCau.appendChild(div);
-        });
-    }
-
-    function choiTaiXiu() {
-        const tien = parseInt(document.getElementById("tienCuoc").value);
-        const luaChon = document.getElementById("cuocChon").value;
-        if (!tien || tien <= 0) return alert("Vui lòng nhập số tiền hợp lệ.");
-        if (tien > soDu) return alert("Không đủ số dư!");
-
-        const dice1 = Math.floor(Math.random() * 6) + 1;
-        const dice2 = Math.floor(Math.random() * 6) + 1;
-        const dice3 = Math.floor(Math.random() * 6) + 1;
-        const tong = dice1 + dice2 + dice3;
-        const ketQua = (tong >= 11 && tong <= 17) ? "tai" : "xiu";
-
-        document.getElementById("dice1").innerText = diceUnicode[dice1 - 1];
-        document.getElementById("dice2").innerText = diceUnicode[dice2 - 1];
-        document.getElementById("dice3").innerText = diceUnicode[dice3 - 1];
-
-        if (luaChon === ketQua) {
-            soDu += tien;
-            document.getElementById("gameResult").innerText = `🎉 Thắng! Tổng ${tong} là ${ketQua.toUpperCase()}.`;
-        } else {
-            soDu -= tien;
-            document.getElementById("gameResult").innerText = `💥 Thua! Tổng ${tong} là ${ketQua.toUpperCase()}.`;
-        }
-
-        capNhatSoDu();
-        capNhatLichSu(tien, luaChon, tong, ketQua);
-        capNhatCau(ketQua);
-    }
-
-    function napTien() {
-        const amount = prompt("Nhập số tiền muốn nạp:");
-        if (amount && !isNaN(amount) && amount > 0) {
-            soDu += parseInt(amount);
-            capNhatSoDu();
-        }
-    }
-
-    function rutTien() {
-        const amount = prompt("Nhập số tiền muốn rút:");
-        if (amount && !isNaN(amount) && amount > 0 && amount <= soDu) {
-            soDu -= parseInt(amount);
-            capNhatSoDu();
-        } else {
-            alert("Số tiền rút không hợp lệ!");
-        }
-    }
-
-    // Auto đăng nhập nếu có phiên
-    window.onload = hienThiGameTheoDangNhap;
-</script>
+      if (cactusLeft <= -20) {
+        cactus.style.left = "800px";
+      } else {
+        cactus.style.left = cactusLeft - 5 + "px";
+      }
+    }, 20);
+  </script>
 </body>
 </html>
