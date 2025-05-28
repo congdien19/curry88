@@ -1,123 +1,188 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>Game Dino Realistic - Online Image Version</title>
+  <title>Game Bầu Cua có Đăng ký và Đăng nhập</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background-color: #e0f7fa;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      font-family: Arial, sans-serif;
-    }
-
-    #game {
-      position: relative;
-      width: 800px;
-      height: 200px;
-      overflow: hidden;
-      border: 2px solid #333;
-      background: url('https://raw.githubusercontent.com/codewithsadee/chrome-dino-clone/master/images/ground.png') repeat-x bottom;
-      background-size: contain;
-    }
-
-    #dino {
-      position: absolute;
-      bottom: 0;
-      left: 50px;
-      width: 60px;
-      height: 60px;
-      background-image: url('https://raw.githubusercontent.com/codewithsadee/chrome-dino-clone/master/images/dino-run1.png');
-      background-size: cover;
-      transition: bottom 0.2s;
-    }
-
-    #cactus {
-      position: absolute;
-      bottom: 0;
-      left: 800px;
-      width: 40px;
-      height: 70px;
-      background-image: url('https://raw.githubusercontent.com/codewithsadee/chrome-dino-clone/master/images/cactus1.png');
-      background-size: cover;
-    }
-
-    .jump {
-      animation: jump 0.5s ease-out;
-    }
-
-    @keyframes jump {
-      0%   { bottom: 0; }
-      50%  { bottom: 100px; }
-      100% { bottom: 0; }
-    }
-
-    #score {
-      position: absolute;
-      top: 10px;
-      right: 20px;
-      color: #333;
-      font-size: 18px;
-      font-weight: bold;
-    }
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+    input { padding: 5px; margin: 5px 0; width: 100%; }
+    button { padding: 10px; margin: 10px 0; width: 100%; cursor: pointer; }
+    .hidden { display: none; }
+    .choices { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    .choice { border: 1px solid #ccc; padding: 10px; cursor: pointer; flex: 1 1 30%; text-align: center; }
+    .selected { background-color: #ffd700; }
+    #result { margin-top: 20px; }
   </style>
 </head>
 <body>
-  <div id="game">
-    <div id="score">Score: 0</div>
-    <div id="dino"></div>
-    <div id="cactus"></div>
+
+  <h1>Game Bầu Cua</h1>
+
+  <!-- Phần đăng ký -->
+  <div id="registerSection">
+    <h2>Đăng ký</h2>
+    <input type="email" id="regEmail" placeholder="Email" required />
+    <input type="password" id="regPassword" placeholder="Mật khẩu" required />
+    <button id="btnRegister">Đăng ký</button>
+    <p id="regMessage"></p>
+    <p>Bạn đã có tài khoản? <a href="#" id="showLogin">Đăng nhập tại đây</a></p>
   </div>
 
-  <script>
-    const dino = document.getElementById("dino");
-    const cactus = document.getElementById("cactus");
-    const scoreEl = document.getElementById("score");
+  <!-- Phần đăng nhập -->
+  <div id="loginSection" class="hidden">
+    <h2>Đăng nhập</h2>
+    <input type="email" id="loginEmail" placeholder="Email" required />
+    <input type="password" id="loginPassword" placeholder="Mật khẩu" required />
+    <button id="btnLogin">Đăng nhập</button>
+    <p id="loginMessage"></p>
+    <p>Chưa có tài khoản? <a href="#" id="showRegister">Đăng ký tại đây</a></p>
+  </div>
 
-    let score = 0;
-    let gameRunning = true;
+  <!-- Phần chơi game -->
+  <div id="gameSection" class="hidden">
+    <p>Xin chào, <span id="userEmail"></span>! <button id="btnLogout">Đăng xuất</button></p>
+    <p>Chọn con vật đặt cược (bấm vào để chọn hoặc bỏ chọn):</p>
+    <div class="choices" id="choices">
+      <div class="choice" data-name="Bầu">Bầu</div>
+      <div class="choice" data-name="Cua">Cua</div>
+      <div class="choice" data-name="Tôm">Tôm</div>
+      <div class="choice" data-name="Cá">Cá</div>
+      <div class="choice" data-name="Gà">Gà</div>
+      <div class="choice" data-name="Nai">Nai</div>
+    </div>
+    <button id="btnPlay">Quay xúc xắc</button>
 
-    document.addEventListener("keydown", function (event) {
-      if ((event.code === "Space" || event.code === "ArrowUp") && gameRunning) {
-        jump();
-      }
-    });
+    <h2>Kết quả:</h2>
+    <div id="result"></div>
+  </div>
 
-    function jump() {
-      if (!dino.classList.contains("jump")) {
-        dino.classList.add("jump");
-        setTimeout(() => dino.classList.remove("jump"), 500);
-      }
+<script>
+  // Lưu danh sách user vào localStorage (dữ liệu giả lập)
+  function getUsers() {
+    return JSON.parse(localStorage.getItem('baucua_users') || '[]');
+  }
+  function saveUsers(users) {
+    localStorage.setItem('baucua_users', JSON.stringify(users));
+  }
+
+  // Đăng ký
+  document.getElementById('btnRegister').onclick = () => {
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value.trim();
+    const users = getUsers();
+
+    if(!email || !password) {
+      document.getElementById('regMessage').textContent = 'Vui lòng nhập đầy đủ thông tin.';
+      return;
+    }
+    if(users.some(u => u.email === email)) {
+      document.getElementById('regMessage').textContent = 'Email đã được đăng ký.';
+      return;
+    }
+    users.push({ email, password });
+    saveUsers(users);
+    document.getElementById('regMessage').textContent = 'Đăng ký thành công! Vui lòng đăng nhập.';
+    document.getElementById('regEmail').value = '';
+    document.getElementById('regPassword').value = '';
+  };
+
+  // Hiển thị đăng ký / đăng nhập
+  document.getElementById('showLogin').onclick = e => {
+    e.preventDefault();
+    document.getElementById('registerSection').classList.add('hidden');
+    document.getElementById('loginSection').classList.remove('hidden');
+  };
+  document.getElementById('showRegister').onclick = e => {
+    e.preventDefault();
+    document.getElementById('loginSection').classList.add('hidden');
+    document.getElementById('registerSection').classList.remove('hidden');
+  };
+
+  // Đăng nhập
+  document.getElementById('btnLogin').onclick = () => {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+    const users = getUsers();
+
+    if(!email || !password) {
+      document.getElementById('loginMessage').textContent = 'Vui lòng nhập đầy đủ thông tin.';
+      return;
+    }
+    const user = users.find(u => u.email === email && u.password === password);
+    if(!user) {
+      document.getElementById('loginMessage').textContent = 'Email hoặc mật khẩu không đúng.';
+      return;
     }
 
-    let checkCollision = setInterval(function () {
-      if (!gameRunning) return;
+    localStorage.setItem('baucua_loggedIn', email);
+    startGame(email);
+  };
 
-      let dinoTop = parseInt(window.getComputedStyle(dino).getPropertyValue("top")) || 0;
-      let cactusLeft = parseInt(window.getComputedStyle(cactus).getPropertyValue("left")) || 0;
+  // Kiểm tra đăng nhập khi load trang
+  window.onload = () => {
+    const loggedIn = localStorage.getItem('baucua_loggedIn');
+    if(loggedIn) {
+      startGame(loggedIn);
+    }
+  };
 
-      if (cactusLeft < 90 && cactusLeft > 50 && dinoTop > 130) {
-        gameRunning = false;
-        alert("💥 Game Over! Score: " + score);
-        location.reload();
-      }
-    }, 10);
+  // Bắt đầu chơi game
+  function startGame(email) {
+    document.getElementById('registerSection').classList.add('hidden');
+    document.getElementById('loginSection').classList.add('hidden');
+    document.getElementById('gameSection').classList.remove('hidden');
+    document.getElementById('userEmail').textContent = email;
+  }
 
-    let moveCactus = setInterval(function () {
-      if (!gameRunning) return;
+  // Đăng xuất
+  document.getElementById('btnLogout').onclick = () => {
+    localStorage.removeItem('baucua_loggedIn');
+    document.getElementById('gameSection').classList.add('hidden');
+    document.getElementById('registerSection').classList.remove('hidden');
+  };
 
-      let cactusLeft = parseInt(window.getComputedStyle(cactus).getPropertyValue("left"));
-      if (cactusLeft <= -50) {
-        cactus.style.left = "800px";
-        score++;
-        scoreEl.innerText = "Score: " + score;
+  // Chơi game Bầu Cua
+  const choices = document.querySelectorAll('.choice');
+  let bets = new Set();
+
+  choices.forEach(c => {
+    c.addEventListener('click', () => {
+      const name = c.dataset.name;
+      if(bets.has(name)) {
+        bets.delete(name);
+        c.classList.remove('selected');
       } else {
-        cactus.style.left = cactusLeft - 5 + "px";
+        bets.add(name);
+        c.classList.add('selected');
       }
-    }, 20);
-  </script>
+    });
+  });
+
+  document.getElementById('btnPlay').onclick = () => {
+    if(bets.size === 0) {
+      alert('Vui lòng chọn ít nhất một con vật để đặt cược.');
+      return;
+    }
+    const animals = ['Bầu', 'Cua', 'Tôm', 'Cá', 'Gà', 'Nai'];
+    const results = [];
+    for(let i = 0; i < 3; i++) {
+      results.push(animals[Math.floor(Math.random() * animals.length)]);
+    }
+
+    let winCount = 0;
+    results.forEach(r => {
+      if(bets.has(r)) winCount++;
+    });
+
+    let message = `Kết quả xúc xắc: <b>${results.join(', ')}</b>.<br>`;
+    if(winCount > 0) {
+      message += `Bạn thắng ${winCount} lần! 🎉`;
+    } else {
+      message += `Bạn thua rồi! 😞`;
+    }
+    document.getElementById('result').innerHTML = message;
+  };
+</script>
+
 </body>
 </html>
