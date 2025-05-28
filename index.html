@@ -5,13 +5,33 @@
   <title>Game Bầu Cua có Đăng ký và Đăng nhập</title>
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; }
-    input { padding: 5px; margin: 5px 0; width: 100%; }
+    input[type="email"], input[type="password"], input[type="number"] {
+      padding: 5px; margin: 5px 0; width: 100%;
+      box-sizing: border-box;
+    }
     button { padding: 10px; margin: 10px 0; width: 100%; cursor: pointer; }
     .hidden { display: none; }
     .choices { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-    .choice { border: 1px solid #ccc; padding: 10px; cursor: pointer; flex: 1 1 30%; text-align: center; }
+    .choice {
+      border: 1px solid #ccc; padding: 10px; cursor: pointer; 
+      flex: 1 1 30%; text-align: center; position: relative;
+      user-select: none;
+    }
     .selected { background-color: #ffd700; }
+    .bet-input {
+      width: 80px; margin-top: 8px; text-align: center;
+      display: none;
+    }
+    .choice.selected .bet-input { display: inline-block; }
     #result { margin-top: 20px; }
+    .icon {
+      font-size: 24px;
+      display: block;
+      margin-bottom: 6px;
+    }
+    #balance {
+      font-weight: bold; margin-bottom: 15px;
+    }
   </style>
 </head>
 <body>
@@ -41,14 +61,15 @@
   <!-- Phần chơi game -->
   <div id="gameSection" class="hidden">
     <p>Xin chào, <span id="userEmail"></span>! <button id="btnLogout">Đăng xuất</button></p>
-    <p>Chọn con vật đặt cược (bấm vào để chọn hoặc bỏ chọn):</p>
+    <p id="balance">Số dư: <span id="userBalance"></span> VND</p>
+    <p>Chọn con vật đặt cược (bấm vào để chọn hoặc bỏ chọn), nhập số tiền cược:</p>
     <div class="choices" id="choices">
-      <div class="choice" data-name="Bầu">Bầu</div>
-      <div class="choice" data-name="Cua">Cua</div>
-      <div class="choice" data-name="Tôm">Tôm</div>
-      <div class="choice" data-name="Cá">Cá</div>
-      <div class="choice" data-name="Gà">Gà</div>
-      <div class="choice" data-name="Nai">Nai</div>
+      <div class="choice" data-name="Bầu"><span class="icon">🎃</span>Bầu<br><input type="number" class="bet-input" min="0" placeholder="Tiền cược" /></div>
+      <div class="choice" data-name="Cua"><span class="icon">🦀</span>Cua<br><input type="number" class="bet-input" min="0" placeholder="Tiền cược" /></div>
+      <div class="choice" data-name="Tôm"><span class="icon">🦐</span>Tôm<br><input type="number" class="bet-input" min="0" placeholder="Tiền cược" /></div>
+      <div class="choice" data-name="Cá"><span class="icon">🐟</span>Cá<br><input type="number" class="bet-input" min="0" placeholder="Tiền cược" /></div>
+      <div class="choice" data-name="Gà"><span class="icon">🐔</span>Gà<br><input type="number" class="bet-input" min="0" placeholder="Tiền cược" /></div>
+      <div class="choice" data-name="Nai"><span class="icon">🦌</span>Nai<br><input type="number" class="bet-input" min="0" placeholder="Tiền cược" /></div>
     </div>
     <button id="btnPlay">Quay xúc xắc</button>
 
@@ -79,11 +100,19 @@
       document.getElementById('regMessage').textContent = 'Email đã được đăng ký.';
       return;
     }
-    users.push({ email, password });
+    // Khởi tạo số dư mặc định 1000 VND
+    users.push({ email, password, balance: 1000 });
     saveUsers(users);
     document.getElementById('regMessage').textContent = 'Đăng ký thành công! Vui lòng đăng nhập.';
     document.getElementById('regEmail').value = '';
     document.getElementById('regPassword').value = '';
+
+    // Tự động chuyển sang đăng nhập sau 1.5s
+    setTimeout(() => {
+      document.getElementById('registerSection').classList.add('hidden');
+      document.getElementById('loginSection').classList.remove('hidden');
+      document.getElementById('regMessage').textContent = '';
+    }, 1500);
   };
 
   // Hiển thị đăng ký / đăng nhập
@@ -132,6 +161,22 @@
     document.getElementById('loginSection').classList.add('hidden');
     document.getElementById('gameSection').classList.remove('hidden');
     document.getElementById('userEmail').textContent = email;
+
+    // Load số dư user
+    const users = getUsers();
+    const user = users.find(u => u.email === email);
+    if(user) {
+      document.getElementById('userBalance').textContent = user.balance.toLocaleString();
+    }
+
+    // Reset chọn cược và input tiền cược
+    bets.clear();
+    document.querySelectorAll('.choice').forEach(choice => {
+      choice.classList.remove('selected');
+      const input = choice.querySelector('.bet-input');
+      input.value = '';
+      input.style.display = 'none';
+    });
   }
 
   // Đăng xuất
@@ -143,44 +188,114 @@
 
   // Chơi game Bầu Cua
   const choices = document.querySelectorAll('.choice');
-  let bets = new Set();
+  let bets = new Map();
 
   choices.forEach(c => {
     c.addEventListener('click', () => {
       const name = c.dataset.name;
-      if(bets.has(name)) {
-        bets.delete(name);
+      const input = c.querySelector('.bet-input');
+
+      if(c.classList.contains('selected')) {
+        // Bỏ chọn
         c.classList.remove('selected');
+        input.style.display = 'none';
+        input.value = '';
+        bets.delete(name);
       } else {
-        bets.add(name);
+        // Chọn
         c.classList.add('selected');
+        input.style.display = 'inline-block';
+        input.focus();
+        bets.set(name, 0);
+      }
+    });
+
+    // Cập nhật tiền cược khi thay đổi input
+    const input = c.querySelector('.bet-input');
+    input.addEventListener('input', (e) => {
+      const value = parseInt(e.target.value);
+      const name = c.dataset.name;
+      if(isNaN(value) || value < 0) {
+        bets.set(name, 0);
+      } else {
+        bets.set(name, value);
       }
     });
   });
 
   document.getElementById('btnPlay').onclick = () => {
-    if(bets.size === 0) {
-      alert('Vui lòng chọn ít nhất một con vật để đặt cược.');
+    // Lọc những con vật có tiền cược > 0
+    const activeBets = Array.from(bets.entries()).filter(([_, val]) => val > 0);
+    if(activeBets.length === 0) {
+      alert('Vui lòng chọn ít nhất một con vật và đặt số tiền cược lớn hơn 0.');
       return;
     }
+
+    // Lấy user và số dư
+    const email = localStorage.getItem('baucua_loggedIn');
+    const users = getUsers();
+    const userIndex = users.findIndex(u => u.email === email);
+    if(userIndex === -1) {
+      alert('Người dùng không tồn tại.');
+      return;
+    }
+    const user = users[userIndex];
+
+    // Tổng tiền cược
+    const totalBet = activeBets.reduce((sum, [_, val]) => sum + val, 0);
+    if(totalBet > user.balance) {
+      alert(`Số dư không đủ. Bạn có ${user.balance.toLocaleString()} VND.`);
+      return;
+    }
+
+    // Quay xúc xắc
     const animals = ['Bầu', 'Cua', 'Tôm', 'Cá', 'Gà', 'Nai'];
     const results = [];
     for(let i = 0; i < 3; i++) {
       results.push(animals[Math.floor(Math.random() * animals.length)]);
     }
 
-    let winCount = 0;
+    // Tính tiền thắng
+    // Mỗi lần con vật xuất hiện, thắng = tiền cược * số lần xuất hiện
+    let winMoney = 0;
     results.forEach(r => {
-      if(bets.has(r)) winCount++;
+      activeBets.forEach(([betAnimal, betAmount]) => {
+        if(betAnimal === r) {
+          winMoney += betAmount;
+        }
+      });
     });
 
+    // Cập nhật số dư
+    user.balance = user.balance - totalBet + winMoney;
+    users[userIndex] = user;
+    saveUsers(users);
+    document.getElementById('userBalance').textContent = user.balance.toLocaleString();
+
+    // Hiển thị kết quả
     let message = `Kết quả xúc xắc: <b>${results.join(', ')}</b>.<br>`;
-    if(winCount > 0) {
-      message += `Bạn thắng ${winCount} lần! 🎉`;
+    if(winMoney > 0) {
+      const netWin = winMoney - totalBet;
+      if(netWin >= 0) {
+        message += `Bạn thắng <b>${netWin.toLocaleString()}</b> VND! 🎉<br>`;
+      } else {
+        message += `Bạn thua <b>${-netWin.toLocaleString()}</b> VND! 😞<br>`;
+      }
     } else {
-      message += `Bạn thua rồi! 😞`;
+      message += `Bạn thua <b>${totalBet.toLocaleString()}</b> VND! 😞<br>`;
     }
+    message += `Số dư hiện tại: <b>${user.balance.toLocaleString()}</b> VND.`;
+
     document.getElementById('result').innerHTML = message;
+
+    // Reset cược
+    bets.clear();
+    document.querySelectorAll('.choice').forEach(choice => {
+      choice.classList.remove('selected');
+      const input = choice.querySelector('.bet-input');
+      input.value = '';
+      input.style.display = 'none';
+    });
   };
 </script>
 
