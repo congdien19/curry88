@@ -1,1 +1,105 @@
-
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WB CRM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background-color: #333;
+            color: white;
+            position: fixed;
+            padding-top: 20px;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar ul li {
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        .sidebar ul li:hover {
+            background-color: #555;
+        }
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+        .card {
+            background-color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .card img {
+            width: 50px;
+            height: 50px;
+        }
+        .right-panel {
+            grid-column: 4 / 5;
+            background-color: #1da1f2;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px;
+        }
+        .right-panel button {
+            background-color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <ul>
+            <li>Trang chủ</li>
+            <li>Dịch vụ Facebook</li>
+            <li>Nạp tiền tài khoản</li>
+            <li>Website & API</li>
+            <li>Bảng giá & cập nhật</li>
+            <li>Lịch sử giao dịch</li>
+            <li>Sản phẩm & Dịch vụ</li>
+            <li>Dịch vụ Facebook</li>
+            <li>Dịch vụ Instagram</li>
+            <li>Dịch vụ TikTok</li>
+            <li>Dịch vụ YouTube</li>
+            <li>Dịch vụ Shopee</li>
+            <li>Dịch vụ Lazada</li>
+        </ul>
+    </div>
+    <div class="content">
+        <div class="card"><img src="facebook-icon.png" alt="Facebook"><br>Tăng like bài viết</div>
+        <div class="card"><img src="message-icon.png" alt="Message"><br>Tăng bình luận</div>
+        <div class="card"><img src="like-icon.png" alt="Like"><br>Tăng theo dõi</div>
+        <div class="card"><img src="like-icon.png" alt="Like"><br>Tăng like page</div>
+        <div class="card"><img src="group-icon.png" alt="Group"><br>Tăng member group</div>
+        <div class="card"><img src="live-icon.png" alt="Live"><br>Tăng lượt live</div>
+        <div class="card"><img src="story-icon.png" alt="Story"><br>Tăng view story</div>
+        <div class="card"><img src="video-icon.png" alt="Video"><br>Tăng view video</div>
+        <div class="right-panel">
+            <h3>Chưa đăng nhập</h3>
+            <p>Số dư: 0 VND</p>
+            <button>Đăng nhập tài khoản</button>
+            <button>Đăng nhập</button>
+            <p>Thông báo mới</p>
+            <p>2025-06-02 15:59:00 - Khuyến mãi 10%...</p>
+        </div>
+    </div>
+</body>
+</html>
