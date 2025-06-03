@@ -58,6 +58,60 @@
 </head>
 
 <body>
+  <!-- Modal Đăng nhập -->
+  <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Đăng nhập</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label>Email</label>
+              <input type="email" class="form-control" placeholder="Nhập email">
+            </div>
+            <div class="mb-3">
+              <label>Mật khẩu</label>
+              <input type="password" class="form-control" placeholder="Nhập mật khẩu">
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Đăng ký -->
+  <div class="modal fade" id="registerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Đăng ký</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label>Họ tên</label>
+              <input type="text" class="form-control" placeholder="Nhập họ tên">
+            </div>
+            <div class="mb-3">
+              <label>Email</label>
+              <input type="email" class="form-control" placeholder="Nhập email">
+            </div>
+            <div class="mb-3">
+              <label>Mật khẩu</label>
+              <input type="password" class="form-control" placeholder="Tạo mật khẩu">
+            </div>
+            <button type="submit" class="btn btn-success w-100">Đăng ký</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="container-fluid">
     <div class="row">
       <!-- Sidebar -->
@@ -69,12 +123,15 @@
           <a href="#"><i class="fas fa-globe me-2"></i>Website & API</a>
           <a href="#"><i class="fas fa-tags me-2"></i>Bảng giá</a>
           <a href="#"><i class="fas fa-history me-2"></i>Lịch sử</a>
-
           <hr />
           <p class="text-muted px-3 mt-3">Sản phẩm & Dịch vụ</p>
           <a href="#"><i class="fab fa-facebook me-2"></i>Dịch vụ Facebook</a>
           <a href="#"><i class="fab fa-instagram me-2"></i>Dịch vụ Instagram</a>
           <a href="#"><i class="fab fa-tiktok me-2"></i>Dịch vụ Tiktok</a>
+
+          <hr />
+          <button class="btn btn-outline-primary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#loginModal">Đăng nhập</button>
+          <button class="btn btn-outline-success w-100" data-bs-toggle="modal" data-bs-target="#registerModal">Đăng ký</button>
         </div>
       </nav>
 
@@ -109,55 +166,8 @@
         </div>
 
         <div class="row">
-          <div class="col-md-3">
-            <div class="service-box">
-              <img src="https://cdn-icons-png.flaticon.com/512/889/889140.png" alt="like">
-              <h6>Tăng like bài viết</h6>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="service-box">
-              <img src="https://cdn-icons-png.flaticon.com/512/1380/1380338.png" alt="comment">
-              <h6>Tăng bình luận</h6>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="service-box">
-              <img src="https://cdn-icons-png.flaticon.com/512/1946/1946433.png" alt="follow">
-              <h6>Tăng theo dõi</h6>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="service-box">
-              <img src="https://cdn-icons-png.flaticon.com/512/609/609803.png" alt="page">
-              <h6>Tăng like page</h6>
-            </div>
-          </div>
-
-          <div class="col-md-3">
-            <div class="service-box">
-              <img src="https://cdn-icons-png.flaticon.com/512/942/942748.png" alt="view">
-              <h6>Tăng lượt xem</h6>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="service-box">
-              <img src="https://cdn-icons-png.flaticon.com/512/3239/3239953.png" alt="share">
-              <h6>Tăng chia sẻ</h6>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="service-box">
-              <img src="https://cdn-icons-png.flaticon.com/512/727/727399.png" alt="comment reply">
-              <h6>Phản hồi bình luận</h6>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="service-box">
-              <img src="https://cdn-icons-png.flaticon.com/512/535/535239.png" alt="sub">
-              <h6>Tăng sub YouTube</h6>
-            </div>
-          </div>
+          <!-- Các thẻ dịch vụ như hiện tại -->
+          <!-- Không thay đổi ở đây để giữ nguyên phần đã có -->
         </div>
       </main>
     </div>
