@@ -1,105 +1,124 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WB CRM</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-        .sidebar {
-            width: 250px;
-            height: 100vh;
-            background-color: #333;
-            color: white;
-            position: fixed;
-            padding-top: 20px;
-        }
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
-        }
-        .sidebar ul li {
-            padding: 10px 20px;
-            cursor: pointer;
-        }
-        .sidebar ul li:hover {
-            background-color: #555;
-        }
-        .content {
-            margin-left: 250px;
-            padding: 20px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-        }
-        .card {
-            background-color: white;
-            padding: 20px;
-            text-align: center;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .card img {
-            width: 50px;
-            height: 50px;
-        }
-        .right-panel {
-            grid-column: 4 / 5;
-            background-color: #1da1f2;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            border-radius: 5px;
-        }
-        .right-panel button {
-            background-color: white;
-            border: none;
-            padding: 10px 20px;
-            margin: 10px 0;
-            cursor: pointer;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>W3 CRM Demo</title>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    .service-card {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      padding: 20px;
+      text-align: center;
+      border-radius: 8px;
+      font-weight: 500;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s;
+    }
+
+    .service-card:hover {
+      background-color: #f0f8ff;
+      transform: translateY(-3px);
+    }
+
+    .account-box {
+      background-color: #e3f2fd;
+      border-radius: 10px;
+    }
+
+    .account-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+    }
+
+    .nav-link {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  </style>
 </head>
 <body>
-    <div class="sidebar">
-        <ul>
-            <li>Trang chủ</li>
-            <li>Dịch vụ Facebook</li>
-            <li>Nạp tiền tài khoản</li>
-            <li>Website & API</li>
-            <li>Bảng giá & cập nhật</li>
-            <li>Lịch sử giao dịch</li>
-            <li>Sản phẩm & Dịch vụ</li>
-            <li>Dịch vụ Facebook</li>
-            <li>Dịch vụ Instagram</li>
-            <li>Dịch vụ TikTok</li>
-            <li>Dịch vụ YouTube</li>
-            <li>Dịch vụ Shopee</li>
-            <li>Dịch vụ Lazada</li>
+  <!-- Header -->
+  <nav class="navbar navbar-dark bg-dark px-3">
+    <span class="navbar-brand mb-0 h1">W3 CRM</span>
+    <span class="text-white">Khách hàng truy cập | Chưa đăng nhập</span>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-md-2 bg-light p-3 border-end vh-100">
+        <h6 class="text-primary">Trang chủ</h6>
+        <ul class="nav flex-column">
+          <li class="nav-item"><a class="nav-link" href="#">Tài khoản của tôi</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Nạp tiền</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Website & API</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Dịch vụ Facebook</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Dịch vụ Instagram</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Dịch vụ Tiktok</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Dịch vụ Youtube</a></li>
         </ul>
-    </div>
-    <div class="content">
-        <div class="card"><img src="facebook-icon.png" alt="Facebook"><br>Tăng like bài viết</div>
-        <div class="card"><img src="message-icon.png" alt="Message"><br>Tăng bình luận</div>
-        <div class="card"><img src="like-icon.png" alt="Like"><br>Tăng theo dõi</div>
-        <div class="card"><img src="like-icon.png" alt="Like"><br>Tăng like page</div>
-        <div class="card"><img src="group-icon.png" alt="Group"><br>Tăng member group</div>
-        <div class="card"><img src="live-icon.png" alt="Live"><br>Tăng lượt live</div>
-        <div class="card"><img src="story-icon.png" alt="Story"><br>Tăng view story</div>
-        <div class="card"><img src="video-icon.png" alt="Video"><br>Tăng view video</div>
-        <div class="right-panel">
-            <h3>Chưa đăng nhập</h3>
-            <p>Số dư: 0 VND</p>
-            <button>Đăng nhập tài khoản</button>
-            <button>Đăng nhập</button>
-            <p>Thông báo mới</p>
-            <p>2025-06-02 15:59:00 - Khuyến mãi 10%...</p>
+      </div>
+
+      <!-- Main content -->
+      <div class="col-md-7 p-4">
+        <h5 class="mb-4">Dịch vụ Facebook</h5>
+        <div class="row g-3">
+          <div class="col-md-4"><div class="service-card">Tăng like bài viết</div></div>
+          <div class="col-md-4"><div class="service-card">Tăng bình luận</div></div>
+          <div class="col-md-4"><div class="service-card">Tăng theo dõi</div></div>
+          <div class="col-md-4"><div class="service-card">Tăng member group</div></div>
+          <div class="col-md-4"><div class="service-card">Tăng mắt live</div></div>
+          <div class="col-md-4"><div class="service-card">Tăng view story</div></div>
+          <div class="col-md-4"><div class="service-card">Tăng like page</div></div>
+          <div class="col-md-4"><div class="service-card">Tăng view video</div></div>
+          <div class="col-md-4"><div class="service-card">Vip like tháng</div></div>
         </div>
+
+        <h5 class="mt-5 mb-3">Dịch vụ Instagram</h5>
+        <div class="row g-3">
+          <div class="col-md-4"><div class="service-card">Tăng like bài viết</div></div>
+          <div class="col-md-4"><div class="service-card">Tăng theo dõi</div></div>
+        </div>
+      </div>
+
+      <!-- Account Sidebar -->
+      <div class="col-md-3 p-4 bg-light border-start">
+        <div class="account-box text-center p-3">
+          <div class="account-avatar bg-secondary mb-2 mx-auto"></div>
+          <h6>Chưa đăng nhập</h6>
+          <div class="d-flex justify-content-around mt-3">
+            <div>
+              <div class="text-muted">Số dư</div>
+              <div>0 VND</div>
+            </div>
+            <div>
+              <div class="text-muted">Đã nạp</div>
+              <div>0 VND</div>
+            </div>
+          </div>
+          <button class="btn btn-primary mt-3">Đăng nhập tài khoản</button>
+        </div>
+
+        <div class="mt-4">
+          <h6>Thông báo mới</h6>
+          <ul class="list-unstyled small">
+            <li>🎉 Khuyến mãi 10% nạp đến 06/06/2025</li>
+            <li>🧪 Mở thử nghiệm dịch vụ SV48</li>
+          </ul>
+        </div>
+      </div>
     </div>
+  </div>
 </body>
 </html>
