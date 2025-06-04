@@ -24,6 +24,7 @@
       padding: 10px 20px;
       color: #333;
       text-decoration: none;
+      cursor: pointer;
     }
     .sidebar a:hover {
       background: #f1f1f1;
@@ -86,7 +87,7 @@
   <div class="sidebar">
     <a href="#"><i class="fas fa-house"></i>Trang chủ</a>
     <a href="#"><i class="fas fa-user"></i>Tài khoản</a>
-    <a href="#"><i class="fas fa-wallet"></i>Nạp tiền</a>
+    <a href="#" id="sidebarNapTien"><i class="fas fa-wallet"></i>Nạp tiền</a>
     <a href="#"><i class="fas fa-globe"></i>Website & API</a>
     <a href="#"><i class="fas fa-list"></i>Bảng giá</a>
     <a href="#"><i class="fab fa-facebook"></i>Dịch vụ Facebook</a>
@@ -202,7 +203,7 @@
           <div>Chưa đăng nhập</div>
           <div class="mt-2">Số dư: <strong>0 VND</strong></div>
           <div>Đã nạp: <strong>0 VND</strong></div>
-          <button class="btn btn-light btn-sm mt-3">Đăng nhập</button>
+          <button class="btn btn-light btn-sm mt-3" id="btnNapTienAccount">Nạp tiền</button>
         </div>
 
         <div class="notification-box">
@@ -220,5 +221,17 @@
 
   <!-- Script -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Nút Nạp tiền ở Sidebar
+    document.getElementById('sidebarNapTien').addEventListener('click', function(e){
+      e.preventDefault();
+      window.location.href = 'nap-tien.html'; // đổi thành đường dẫn trang nạp tiền của bạn
+    });
+
+    // Nút Nạp tiền trong Account box
+    document.getElementById('btnNapTienAccount').addEventListener('click', function(){
+      window.location.href = 'nap-tien.html'; // đổi thành đường dẫn trang nạp tiền của bạn
+    });
+  </script>
 </body>
 </html>
