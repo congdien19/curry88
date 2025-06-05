@@ -1,86 +1,104 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dịch vụ Facebook</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f7f7f7;
-      padding: 20px;
-    }
-
-    .menu-container {
-      width: 250px;
-      border: 1px solid #e0e0e0;
-      background-color: white;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    .menu-header {
-      display: flex;
-      align-items: center;
-      padding: 10px;
-      cursor: pointer;
-      color: #007bff;
-      font-weight: bold;
-    }
-
-    .fb-icon {
-      width: 20px;
-      height: 20px;
-      margin-right: 10px;
-    }
-
-    .arrow {
-      margin-left: auto;
-    }
-
-    .dropdown-menu {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: none;
-    }
-
-    .dropdown-menu li {
-      padding: 8px 12px;
-      font-size: 14px;
-      color: #555;
-      cursor: pointer;
-    }
-
-    .dropdown-menu li:hover {
-      background-color: #f0f0f0;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Accordion Dropdown Menu</title>
+    <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.22.5/Babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
-  <div class="menu-container">
-    <div class="menu-header" onclick="toggleDropdown()">
-      <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" alt="Facebook Icon" class="fb-icon"/>
-      <span>Dịch vụ Facebook</span>
-      <span class="arrow">&#9662;</span>
-    </div>
-    <ul class="dropdown-menu" id="dropdownMenu">
-      <li>- Tăng like bài viết</li>
-      <li>- Tăng bình luận</li>
-      <li>- Tăng theo dõi</li>
-      <li>- Tăng like page</li>
-      <li>- Tăng member group</li>
-      <li>- Tăng mắt live</li>
-      <li>- Tăng view story</li>
-      <li>- Tăng view video</li>
-      <li>- Vip like tháng</li>
-    </ul>
-  </div>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState } = React;
 
-  <script>
-    function toggleDropdown() {
-      const dropdown = document.getElementById("dropdownMenu");
-      dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
-    }
-  </script>
+        const menuItems = [
+            {
+                title: "Trang Chủ",
+                items: ["Tổng Quan", "Tin Tức", "Giới Thiệu"]
+            },
+            {
+                title: "Sản Phẩm",
+                items: ["Điện Thoại", "Laptop", "Phụ Kiện"]
+            },
+            {
+                title: "Dịch Vụ",
+                items: ["Bảo Hành", "Sửa Chữa", "Tư Vấn"]
+            },
+            {
+                title: "Liên Hệ",
+                items: ["Hỗ Trợ", "Địa Chỉ", "Email"]
+            }
+        ];
+
+        const AccordionItem = ({ title, items, isOpen, onToggle }) => {
+            return (
+                <div className="border-b border-gray-200">
+                    <button
+                        className="w-full flex justify-between items-center p-4 text-left bg-gray-100 hover:bg-gray-200 focus:outline-none"
+                        onClick={onToggle}
+                    >
+                        <span className="text-lg font-medium text-gray-800">{title}</span>
+                        <svg
+                            className={`w-5 h-5 transform transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    {isOpen && (
+                        <div className="bg-white p-4">
+                            {items.map((item, index) => (
+                                <a
+                                    key={index}
+                                    href="#"
+                                    className="block py-2 text-gray-600 hover:text-blue-500"
+                                >
+                                    {item}
+                                </a>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const AccordionMenu = () => {
+            const [openIndex, setOpenIndex] = useState(null);
+
+            const handleToggle = (index) => {
+                setOpenIndex(openIndex === index ? null : index);
+            };
+
+            return (
+                <div className="max-w-md mx-auto mt-10 bg-white shadow-lg rounded-lg overflow-hidden">
+                    {menuItems.map((item, index) => (
+                        <AccordionItem
+                            key={index}
+                            title={item.title}
+                            items={item.items}
+                            isOpen={openIndex === index}
+                            onToggle={() => handleToggle(index)}
+                        />
+                    ))}
+                </div>
+            );
+        };
+
+        const App = () => {
+            return (
+                <div className="min-h-screen bg-gray-50 flex items-start justify-center pt-10">
+                    <AccordionMenu />
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
 </body>
 </html>
