@@ -1,97 +1,86 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>Thanh Menu</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dịch vụ Facebook</title>
   <style>
     body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    .sidebar {
-      width: 250px;
-      background-color: #fff;
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
       padding: 20px;
-      height: 100vh;
-      border-right: 1px solid #eee;
     }
 
-    .menu-item {
+    .menu-container {
+      width: 250px;
+      border: 1px solid #e0e0e0;
+      background-color: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .menu-header {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 10px 8px;
-      color: #333;
-      text-decoration: none;
-      border-radius: 6px;
-      transition: 0.2s;
-      font-size: 15px;
-    }
-
-    .menu-item:hover,
-    .menu-item.active {
-      background-color: #f0f4ff;
-      color: #008cff;
-    }
-
-    .menu-label {
-      margin-top: 25px;
-      margin-bottom: 8px;
+      padding: 10px;
+      cursor: pointer;
+      color: #007bff;
       font-weight: bold;
-      color: #008cff;
+    }
+
+    .fb-icon {
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
+    }
+
+    .arrow {
+      margin-left: auto;
+    }
+
+    .dropdown-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: none;
+    }
+
+    .dropdown-menu li {
+      padding: 8px 12px;
       font-size: 14px;
-    }
-
-    .menu-icon {
-      width: 18px;
-      text-align: center;
-    }
-
-    .logout {
-      margin-top: 25px;
-      text-align: center;
-    }
-
-    .logout button {
-      background-color: #008cff;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      font-weight: bold;
-      border-radius: 6px;
+      color: #555;
       cursor: pointer;
     }
 
-    .logout button:hover {
-      background-color: #006edc;
+    .dropdown-menu li:hover {
+      background-color: #f0f0f0;
     }
   </style>
 </head>
 <body>
-
-<div class="sidebar">
-  <a href="#" class="menu-item active"><i class="fas fa-th menu-icon"></i> Trang chủ</a>
-  <a href="#" class="menu-item"><i class="fas fa-user menu-icon"></i> Tài khoản của tôi</a>
-  <a href="#" class="menu-item"><i class="fas fa-wallet menu-icon"></i> Nạp tiền tài khoản</a>
-  <a href="#" class="menu-item"><i class="fas fa-globe menu-icon"></i> Website riêng & API</a>
-  <a href="#" class="menu-item"><i class="fas fa-chart-bar menu-icon"></i> Bảng giá & cấp bậc</a>
-  <a href="#" class="menu-item"><i class="fas fa-clock menu-icon"></i> Lịch sử giao dịch</a>
-
-  <div class="menu-label">Sản phẩm & Dịch vụ</div>
-  <a href="#" class="menu-item"><i class="fab fa-facebook-f menu-icon"></i> Dịch vụ Facebook</a>
-  <a href="#" class="menu-item"><i class="fab fa-instagram menu-icon"></i> Dịch vụ Instagram</a>
-  <a href="#" class="menu-item"><i class="fab fa-tiktok menu-icon"></i> Dịch vụ Tiktok</a>
-  <a href="#" class="menu-item"><i class="fab fa-youtube menu-icon"></i> Dịch vụ Youtube</a>
-  <a href="#" class="menu-item"><i class="fab fa-threads menu-icon"></i> Dịch vụ Threads</a>
-  <a href="#" class="menu-item"><i class="fas fa-store menu-icon"></i> Dịch vụ Shopee</a>
-  <a href="#" class="menu-item"><i class="fas fa-box menu-icon"></i> Dịch vụ Lazada</a>
-
-  <div class="logout">
-    <button>Đăng xuất</button>
+  <div class="menu-container">
+    <div class="menu-header" onclick="toggleDropdown()">
+      <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" alt="Facebook Icon" class="fb-icon"/>
+      <span>Dịch vụ Facebook</span>
+      <span class="arrow">&#9662;</span>
+    </div>
+    <ul class="dropdown-menu" id="dropdownMenu">
+      <li>- Tăng like bài viết</li>
+      <li>- Tăng bình luận</li>
+      <li>- Tăng theo dõi</li>
+      <li>- Tăng like page</li>
+      <li>- Tăng member group</li>
+      <li>- Tăng mắt live</li>
+      <li>- Tăng view story</li>
+      <li>- Tăng view video</li>
+      <li>- Vip like tháng</li>
+    </ul>
   </div>
-</div>
 
+  <script>
+    function toggleDropdown() {
+      const dropdown = document.getElementById("dropdownMenu");
+      dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+    }
+  </script>
 </body>
 </html>
