@@ -7,45 +7,49 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <style>
     body {
-      background-color: #f8f9fa;
+      background-color: #f0f0f0;
       font-family: 'Segoe UI', sans-serif;
-    }
-    #gameArea {
-      display: none;
-    }
-    .dice img {
-      width: 100px;
-      margin: 10px;
-    }
-    .bet-options img {
-      width: 80px;
-      cursor: pointer;
-      margin: 5px;
-      border: 2px solid transparent;
-      border-radius: 10px;
-    }
-    .bet-options img.selected {
-      border-color: red;
     }
     .logo {
       font-size: 2rem;
       font-weight: bold;
       color: #dc3545;
     }
+    .bet-options img {
+      width: 80px;
+      margin: 5px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      border-radius: 10px;
+    }
+    .bet-options img.selected {
+      border-color: red;
+    }
+    .dice img {
+      width: 100px;
+      margin: 10px;
+    }
+    #gameArea {
+      display: none;
+    }
   </style>
 </head>
 <body class="text-center p-4">
 
-  <!-- Logo thay vì hình ảnh -->
-  <div class="logo mb-3">
+  <!-- Logo -->
+  <div class="logo mb-4">
     <i class="bi bi-dice-5-fill"></i> CURRY88
   </div>
 
-  <!-- Đăng nhập/Đăng ký -->
+  <!-- Đăng nhập / Đăng ký -->
   <div id="authArea" class="card p-4 mx-auto" style="max-width: 400px;">
     <ul class="nav nav-tabs mb-3" id="authTab">
-      <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#loginTab">Đăng nhập</a></li>
-      <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#registerTab">Đăng ký</a></li>
+      <li class="nav-item">
+        <a class="nav-link active" data-bs-toggle="tab" href="#loginTab">Đăng nhập</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#registerTab">Đăng ký</a>
+      </li>
     </ul>
     <div class="tab-content">
       <div class="tab-pane fade show active" id="loginTab">
@@ -61,11 +65,11 @@
     </div>
   </div>
 
-  <!-- Khu vực Game -->
+  <!-- Game Area -->
   <div id="gameArea">
-    <h2 class="my-4">🎲 Bầu Cua Curry88</h2>
-    <p>Chọn một con vật để đặt cược rồi nhấn "Tung xúc xắc".</p>
-    <div class="bet-options d-flex justify-content-center flex-wrap">
+    <h2 class="my-4">🎲 Chào mừng đến Bầu Cua Curry88</h2>
+    <p>Chọn 1 con vật bạn muốn cược rồi nhấn "Tung xúc xắc".</p>
+    <div class="bet-options d-flex justify-content-center flex-wrap mb-3">
       <img src="https://i.imgur.com/6Qh7N4b.png" data-name="Bầu" onclick="selectBet(this)">
       <img src="https://i.imgur.com/JZWXt1w.png" data-name="Cua" onclick="selectBet(this)">
       <img src="https://i.imgur.com/V08HXcW.png" data-name="Tôm" onclick="selectBet(this)">
@@ -73,10 +77,10 @@
       <img src="https://i.imgur.com/qFcFOoL.png" data-name="Nai" onclick="selectBet(this)">
       <img src="https://i.imgur.com/KoCN0hu.png" data-name="Gà" onclick="selectBet(this)">
     </div>
-    <button class="btn btn-danger mt-3" onclick="rollDice()">🎲 Tung xúc xắc</button>
-    <div class="dice mt-4" id="diceResult"></div>
-    <div id="resultMessage" class="mt-3 fw-bold fs-5"></div>
-    <button class="btn btn-secondary mt-4" onclick="logout()">Đăng xuất</button>
+    <button class="btn btn-danger mb-3" onclick="rollDice()">🎲 Tung xúc xắc</button>
+    <div class="dice" id="diceResult"></div>
+    <div id="resultMessage" class="fw-bold fs-5 mt-3"></div>
+    <button class="btn btn-secondary mt-4" onclick="logout()">🔒 Đăng xuất</button>
   </div>
 
   <script>
@@ -84,8 +88,9 @@
     let selectedBet = null;
 
     function register() {
-      const u = document.getElementById("registerUser").value;
-      const p = document.getElementById("registerPass").value;
+      const u = document.getElementById("registerUser").value.trim();
+      const p = document.getElementById("registerPass").value.trim();
+      if (!u || !p) return alert("Vui lòng nhập đủ thông tin.");
       if (users[u]) {
         alert("Tài khoản đã tồn tại!");
       } else {
@@ -96,8 +101,8 @@
     }
 
     function login() {
-      const u = document.getElementById("loginUser").value;
-      const p = document.getElementById("loginPass").value;
+      const u = document.getElementById("loginUser").value.trim();
+      const p = document.getElementById("loginPass").value.trim();
       if (users[u] === p) {
         document.getElementById("authArea").style.display = "none";
         document.getElementById("gameArea").style.display = "block";
@@ -107,7 +112,12 @@
     }
 
     function logout() {
-      location.reload();
+      document.getElementById("authArea").style.display = "block";
+      document.getElementById("gameArea").style.display = "none";
+      selectedBet = null;
+      document.getElementById("resultMessage").innerText = "";
+      document.getElementById("diceResult").innerHTML = "";
+      document.querySelectorAll(".bet-options img").forEach(i => i.classList.remove("selected"));
     }
 
     function selectBet(img) {
@@ -118,11 +128,12 @@
 
     function rollDice() {
       if (!selectedBet) {
-        alert("Vui lòng chọn một con vật để đặt cược!");
+        alert("Vui lòng chọn một con vật để cược!");
         return;
       }
+
       const animals = ["Bầu", "Cua", "Tôm", "Cá", "Nai", "Gà"];
-      const imgUrls = [
+      const images = [
         "https://i.imgur.com/6Qh7N4b.png",
         "https://i.imgur.com/JZWXt1w.png",
         "https://i.imgur.com/V08HXcW.png",
@@ -139,15 +150,16 @@
         const rand = Math.floor(Math.random() * 6);
         result.push(animals[rand]);
         const img = document.createElement("img");
-        img.src = imgUrls[rand];
+        img.src = images[rand];
         diceResult.appendChild(img);
       }
 
       const match = result.filter(r => r === selectedBet).length;
-      const message = match > 0 ? `🎉 Trúng ${match} lần!` : "💥 Rớt rồi, thử lại!";
-      document.getElementById("resultMessage").innerText = message;
+      document.getElementById("resultMessage").innerText =
+        match > 0 ? `🎉 Trúng ${match} lần!` : "💥 Rớt rồi, thử lại!";
     }
   </script>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
