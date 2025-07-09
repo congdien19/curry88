@@ -7,7 +7,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <style>
     body {
-      background-color: #f0f0f0;
+      background-color: #f8f9fa;
       font-family: 'Segoe UI', sans-serif;
     }
     .logo {
@@ -29,8 +29,8 @@
       background-color: #ffeaea;
     }
     .dice span {
-      font-size: 4rem;
-      margin: 10px;
+      font-size: 3rem;
+      margin: 5px;
     }
     #gameArea {
       display: none;
@@ -39,20 +39,13 @@
 </head>
 <body class="text-center p-4">
 
-  <!-- Logo -->
-  <div class="logo mb-4">
-    <i class="bi bi-dice-5-fill"></i> CURRY88
-  </div>
+  <div class="logo mb-4"><i class="bi bi-dice-5-fill"></i> CURRY88</div>
 
-  <!-- Đăng nhập / Đăng ký -->
+  <!-- AUTH -->
   <div id="authArea" class="card p-4 mx-auto" style="max-width: 400px;">
-    <ul class="nav nav-tabs mb-3" id="authTab">
-      <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="tab" href="#loginTab">Đăng nhập</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="tab" href="#registerTab">Đăng ký</a>
-      </li>
+    <ul class="nav nav-tabs mb-3">
+      <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#loginTab">Đăng nhập</a></li>
+      <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#registerTab">Đăng ký</a></li>
     </ul>
     <div class="tab-content">
       <div class="tab-pane fade show active" id="loginTab">
@@ -68,10 +61,12 @@
     </div>
   </div>
 
-  <!-- Game Area -->
+  <!-- GAME -->
   <div id="gameArea">
-    <h2 class="my-4">🎲 Bầu Cua Curry88</h2>
-    <p>Chọn một con để cược rồi nhấn "Tung xúc xắc".</p>
+    <h2 class="mb-3">🎲 Bầu Cua Curry88</h2>
+    <p id="welcomeMsg"></p>
+    <p>Số dư: <span id="balance">0</span> xu</p>
+
     <div class="bet-options d-flex justify-content-center flex-wrap mb-3">
       <button onclick="selectBet(this)" data-name="Bầu">🥒</button>
       <button onclick="selectBet(this)" data-name="Cua">🦀</button>
@@ -80,6 +75,11 @@
       <button onclick="selectBet(this)" data-name="Nai">🦌</button>
       <button onclick="selectBet(this)" data-name="Gà">🐓</button>
     </div>
+
+    <div class="mb-3">
+      <input type="number" id="betAmount" class="form-control w-50 mx-auto" placeholder="Nhập số xu cược">
+    </div>
+
     <button class="btn btn-danger mb-3" onclick="rollDice()">🎲 Tung xúc xắc</button>
     <div class="dice" id="diceResult"></div>
     <div id="resultMessage" class="fw-bold fs-5 mt-3"></div>
@@ -87,9 +87,6 @@
   </div>
 
   <script>
-    let users = JSON.parse(localStorage.getItem("users") || "{}");
-    let selectedBet = null;
-
     const emojiMap = {
       "Bầu": "🥒",
       "Cua": "🦀",
@@ -99,37 +96,44 @@
       "Gà": "🐓"
     };
 
+    let users = JSON.parse(localStorage.getItem("users") || "{}");
+    let currentUser = localStorage.getItem("currentUser");
+    let selectedBet = null;
+
+    function updateBalanceUI() {
+      const user = users[currentUser];
+      document.getElementById("balance").innerText = user.coins;
+      document.getElementById("welcomeMsg").innerText = `Xin chào, ${currentUser}`;
+    }
+
+    function showGame() {
+      document.getElementById("authArea").style.display = "none";
+      document.getElementById("gameArea").style.display = "block";
+      updateBalanceUI();
+    }
+
     function register() {
       const u = document.getElementById("registerUser").value.trim();
       const p = document.getElementById("registerPass").value.trim();
       if (!u || !p) return alert("Vui lòng nhập đủ thông tin.");
-      if (users[u]) {
-        alert("Tài khoản đã tồn tại!");
-      } else {
-        users[u] = p;
-        localStorage.setItem("users", JSON.stringify(users));
-        alert("Đăng ký thành công! Đăng nhập ngay nhé.");
-      }
+      if (users[u]) return alert("Tài khoản đã tồn tại!");
+      users[u] = { password: p, coins: 5000 };
+      localStorage.setItem("users", JSON.stringify(users));
+      alert("Đăng ký thành công!");
     }
 
     function login() {
       const u = document.getElementById("loginUser").value.trim();
       const p = document.getElementById("loginPass").value.trim();
-      if (users[u] === p) {
-        document.getElementById("authArea").style.display = "none";
-        document.getElementById("gameArea").style.display = "block";
-      } else {
-        alert("Sai tài khoản hoặc mật khẩu!");
-      }
+      if (!users[u] || users[u].password !== p) return alert("Sai tài khoản hoặc mật khẩu!");
+      currentUser = u;
+      localStorage.setItem("currentUser", u);
+      showGame();
     }
 
     function logout() {
-      document.getElementById("authArea").style.display = "block";
-      document.getElementById("gameArea").style.display = "none";
-      selectedBet = null;
-      document.getElementById("resultMessage").innerText = "";
-      document.getElementById("diceResult").innerHTML = "";
-      document.querySelectorAll(".bet-options button").forEach(b => b.classList.remove("selected"));
+      localStorage.removeItem("currentUser");
+      location.reload();
     }
 
     function selectBet(btn) {
@@ -139,27 +143,44 @@
     }
 
     function rollDice() {
-      if (!selectedBet) {
-        alert("Vui lòng chọn một con vật để cược!");
-        return;
-      }
+      const bet = parseInt(document.getElementById("betAmount").value);
+      const user = users[currentUser];
+      if (!selectedBet) return alert("Chọn 1 con vật để cược!");
+      if (!bet || bet <= 0) return alert("Nhập số xu cược hợp lệ!");
+      if (bet > user.coins) return alert("Không đủ xu!");
 
       const animals = Object.keys(emojiMap);
-      const result = [];
-      const diceResult = document.getElementById("diceResult");
-      diceResult.innerHTML = "";
+      const results = [];
+      let match = 0;
+      document.getElementById("diceResult").innerHTML = "";
 
       for (let i = 0; i < 3; i++) {
-        const rand = Math.floor(Math.random() * animals.length);
-        result.push(animals[rand]);
+        const rand = animals[Math.floor(Math.random() * 6)];
+        results.push(rand);
+        if (rand === selectedBet) match++;
         const span = document.createElement("span");
-        span.textContent = emojiMap[animals[rand]];
-        diceResult.appendChild(span);
+        span.textContent = emojiMap[rand];
+        document.getElementById("diceResult").appendChild(span);
       }
 
-      const match = result.filter(r => r === selectedBet).length;
-      document.getElementById("resultMessage").innerText =
-        match > 0 ? `🎉 Trúng ${match} lần!` : "💥 Rớt rồi, thử lại!";
+      if (match > 0) {
+        const win = bet * match;
+        user.coins += win;
+        document.getElementById("resultMessage").innerText = `🎉 Trúng ${match} lần, nhận ${win} xu!`;
+      } else {
+        user.coins -= bet;
+        document.getElementById("resultMessage").innerText = `💥 Không trúng, mất ${bet} xu.`;
+      }
+
+      localStorage.setItem("users", JSON.stringify(users));
+      updateBalanceUI();
+    }
+
+    window.onload = () => {
+      if (localStorage.getItem("currentUser")) {
+        currentUser = localStorage.getItem("currentUser");
+        showGame();
+      }
     }
   </script>
 
