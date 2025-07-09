@@ -35,13 +35,20 @@
     #gameArea {
       display: none;
     }
+    .user-info {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body class="text-center p-4">
 
   <div class="logo mb-4"><i class="bi bi-dice-5-fill"></i> CURRY88</div>
 
-  <!-- AUTH -->
+  <!-- AUTH AREA -->
   <div id="authArea" class="card p-4 mx-auto" style="max-width: 400px;">
     <ul class="nav nav-tabs mb-3">
       <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#loginTab">Đăng nhập</a></li>
@@ -61,23 +68,26 @@
     </div>
   </div>
 
-  <!-- GAME -->
+  <!-- GAME AREA -->
   <div id="gameArea">
-    <h2 class="mb-3">🎲 Bầu Cua Curry88</h2>
-    <p id="welcomeMsg"></p>
-    <p>Số dư: <span id="balance">0</span> xu</p>
+    <div class="user-info">
+      <span><i class="bi bi-person-circle"></i> <strong id="usernameDisplay"></strong></span>
+      <button class="btn btn-sm btn-warning" onclick="addMoney()">➕ Nạp 1000 xu</button>
+      <span>Số dư: <strong id="balance">0</strong> xu</span>
+    </div>
 
+    <p>Chọn tối đa 3 con vật để đặt cược</p>
     <div class="bet-options d-flex justify-content-center flex-wrap mb-3">
-      <button onclick="selectBet(this)" data-name="Bầu">🥒</button>
-      <button onclick="selectBet(this)" data-name="Cua">🦀</button>
-      <button onclick="selectBet(this)" data-name="Tôm">🦐</button>
-      <button onclick="selectBet(this)" data-name="Cá">🐟</button>
-      <button onclick="selectBet(this)" data-name="Nai">🦌</button>
-      <button onclick="selectBet(this)" data-name="Gà">🐓</button>
+      <button onclick="toggleBet(this)" data-name="Bầu">🥒</button>
+      <button onclick="toggleBet(this)" data-name="Cua">🦀</button>
+      <button onclick="toggleBet(this)" data-name="Tôm">🦐</button>
+      <button onclick="toggleBet(this)" data-name="Cá">🐟</button>
+      <button onclick="toggleBet(this)" data-name="Nai">🦌</button>
+      <button onclick="toggleBet(this)" data-name="Gà">🐓</button>
     </div>
 
     <div class="mb-3">
-      <input type="number" id="betAmount" class="form-control w-50 mx-auto" placeholder="Nhập số xu cược">
+      <input type="number" id="betAmount" class="form-control w-50 mx-auto" placeholder="Số xu đặt cho MỖI con">
     </div>
 
     <button class="btn btn-danger mb-3" onclick="rollDice()">🎲 Tung xúc xắc</button>
@@ -98,24 +108,24 @@
 
     let users = JSON.parse(localStorage.getItem("users") || "{}");
     let currentUser = localStorage.getItem("currentUser");
-    let selectedBet = null;
+    let selectedBets = [];
 
-    function updateBalanceUI() {
+    function updateUI() {
       const user = users[currentUser];
       document.getElementById("balance").innerText = user.coins;
-      document.getElementById("welcomeMsg").innerText = `Xin chào, ${currentUser}`;
+      document.getElementById("usernameDisplay").innerText = currentUser;
     }
 
     function showGame() {
       document.getElementById("authArea").style.display = "none";
       document.getElementById("gameArea").style.display = "block";
-      updateBalanceUI();
+      updateUI();
     }
 
     function register() {
       const u = document.getElementById("registerUser").value.trim();
       const p = document.getElementById("registerPass").value.trim();
-      if (!u || !p) return alert("Vui lòng nhập đủ thông tin.");
+      if (!u || !p) return alert("Nhập đầy đủ thông tin!");
       if (users[u]) return alert("Tài khoản đã tồn tại!");
       users[u] = { password: p, coins: 5000 };
       localStorage.setItem("users", JSON.stringify(users));
@@ -136,49 +146,67 @@
       location.reload();
     }
 
-    function selectBet(btn) {
-      document.querySelectorAll(".bet-options button").forEach(b => b.classList.remove("selected"));
-      btn.classList.add("selected");
-      selectedBet = btn.getAttribute("data-name");
+    function toggleBet(btn) {
+      const name = btn.getAttribute("data-name");
+      if (btn.classList.contains("selected")) {
+        btn.classList.remove("selected");
+        selectedBets = selectedBets.filter(n => n !== name);
+      } else {
+        if (selectedBets.length >= 3) {
+          alert("Chỉ được chọn tối đa 3 ô!");
+          return;
+        }
+        btn.classList.add("selected");
+        selectedBets.push(name);
+      }
     }
 
     function rollDice() {
-      const bet = parseInt(document.getElementById("betAmount").value);
+      const betPerCon = parseInt(document.getElementById("betAmount").value);
       const user = users[currentUser];
-      if (!selectedBet) return alert("Chọn 1 con vật để cược!");
-      if (!bet || bet <= 0) return alert("Nhập số xu cược hợp lệ!");
-      if (bet > user.coins) return alert("Không đủ xu!");
+
+      if (selectedBets.length === 0) return alert("Chọn ít nhất 1 con để cược!");
+      if (!betPerCon || betPerCon <= 0) return alert("Nhập số xu cược hợp lệ!");
+      const totalBet = betPerCon * selectedBets.length;
+      if (totalBet > user.coins) return alert("Không đủ xu!");
+
+      user.coins -= totalBet;
 
       const animals = Object.keys(emojiMap);
       const results = [];
-      let match = 0;
       document.getElementById("diceResult").innerHTML = "";
 
       for (let i = 0; i < 3; i++) {
         const rand = animals[Math.floor(Math.random() * 6)];
         results.push(rand);
-        if (rand === selectedBet) match++;
         const span = document.createElement("span");
         span.textContent = emojiMap[rand];
         document.getElementById("diceResult").appendChild(span);
       }
 
-      if (match > 0) {
-        const win = bet * match;
-        user.coins += win;
-        document.getElementById("resultMessage").innerText = `🎉 Trúng ${match} lần, nhận ${win} xu!`;
-      } else {
-        user.coins -= bet;
-        document.getElementById("resultMessage").innerText = `💥 Không trúng, mất ${bet} xu.`;
-      }
+      let reward = 0;
+      selectedBets.forEach(bet => {
+        const count = results.filter(r => r === bet).length;
+        reward += count * betPerCon;
+      });
 
+      user.coins += reward;
+      document.getElementById("resultMessage").innerText = reward > 0
+        ? `🎉 Bạn thắng ${reward} xu!`
+        : "💥 Không trúng ô nào!";
+      
       localStorage.setItem("users", JSON.stringify(users));
-      updateBalanceUI();
+      updateUI();
+    }
+
+    function addMoney() {
+      users[currentUser].coins += 1000;
+      localStorage.setItem("users", JSON.stringify(users));
+      updateUI();
     }
 
     window.onload = () => {
-      if (localStorage.getItem("currentUser")) {
-        currentUser = localStorage.getItem("currentUser");
+      if (currentUser && users[currentUser]) {
         showGame();
       }
     }
