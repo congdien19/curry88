@@ -51,6 +51,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      flex-wrap: wrap;
       gap: 15px;
       margin-bottom: 15px;
     }
@@ -84,11 +85,14 @@
     </div>
   </div>
 
-  <!-- KHU VỰC GAME -->
+  <!-- GAME AREA -->
   <div id="gameArea">
     <div class="user-info">
       <span><i class="bi bi-person-circle"></i> <strong id="usernameDisplay"></strong></span>
-      <button class="btn btn-sm btn-warning" onclick="addMoney()">➕ Nạp 1000</button>
+      <form onsubmit="addMoney(event)" class="d-flex align-items-center gap-2">
+        <input type="number" id="moneyInput" class="form-control form-control-sm" style="width:100px" placeholder="Nạp xu">
+        <button class="btn btn-sm btn-warning" type="submit">➕ Nạp</button>
+      </form>
       <span>Số dư: <strong id="balance">0</strong> xu</span>
     </div>
 
@@ -232,10 +236,14 @@
       document.getElementById("usernameDisplay").innerText = currentUser;
     }
 
-    function addMoney() {
-      users[currentUser].coins += 1000;
+    function addMoney(e) {
+      e.preventDefault();
+      const amount = parseInt(document.getElementById("moneyInput").value);
+      if (!amount || amount <= 0) return alert("Vui lòng nhập số tiền hợp lệ!");
+      users[currentUser].coins += amount;
       localStorage.setItem("users", JSON.stringify(users));
       updateUI();
+      document.getElementById("moneyInput").value = "";
     }
 
     function register() {
