@@ -1,412 +1,439 @@
 <!DOCTYPE html>
-<html lang="vi" data-theme="dark">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Tài Xỉu - Quản Lý Tài Khoản</title>
+    <title>Bầu Cua Curry88 - All in One</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"/>
-
     <style>
-        :root {
-            --primary-color: #c0392b; --secondary-color: #f1c40f;
-            --bg-color: #1e3a2a; --win-color: #27ae60; --loss-color: #e74c3c;
-        }
         body {
-            display: flex; justify-content: center; align-items: flex-start;
-            min-height: 100vh; background-color: #111827; padding: 1rem;
+            background-color: #f0f2f5;
         }
-        .main-layout {
-            display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;
-            width: 100%; max-width: 1400px;
-        }
-        article.card {
-            background-color: var(--bg-color); border: 3px solid var(--border-color);
-            padding: 1.5rem;
-        }
-        .card h2, #login-screen h1 { color: var(--secondary-color); text-align: center; }
 
-        /* --- Màn hình đăng nhập / Quản lý tài khoản --- */
-        #login-screen { max-width: 500px; margin: auto; }
-        #existing-accounts-list {
-            display: flex; flex-direction: column; gap: 0.75rem;
-            margin-top: 1.5rem; max-height: 30vh; overflow-y: auto;
+        .auth-body {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
-        .account-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0.75rem; border: 1px solid var(--pico-form-element-border-color);
-            border-radius: var(--pico-border-radius); cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .account-item:hover { background-color: var(--pico-color-primary-hover); }
-        .account-item .delete-btn {
-            background-color: var(--loss-color); color: white;
-            padding: 0.2rem 0.5rem; font-size: 0.8em; border: none; cursor: pointer;
-        }
-        #create-account-form { margin-top: 2rem; border-top: 1px solid #444; padding-top: 1.5rem; }
         
-        #game-container { display: none; }
-        .player-info { display: flex; justify-content: space-between; align-items: center; }
-        #logout-btn { margin-left: 1rem; }
-        .dice { width: 70px; height: 70px; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; font-weight: bold; background-color: #fff; color: #333; }
-        #dice-container { display: flex; justify-content: center; gap: 20px; margin: 1rem 0; }
-        #result-text { font-weight: bold; min-height: 50px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .bet-option { background-color: var(--primary-color); border: 2px solid var(--border-color); padding: 10px; cursor: pointer; text-align: center; font-weight: bold; }
-        .bet-option.win { background-color: var(--win-color) !important; }
-        .bet-option.lose { filter: brightness(0.5); }
-        #history-table td.win { color: var(--win-color); font-weight: bold; }
-        #history-table td.loss { color: var(--loss-color); font-weight: bold; }
+        #game-screen {
+            background-color: #e9ecef;
+        }
+
+        .bet-option {
+            border: 3px solid #dee2e6;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            background-color: #fff;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bet-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-color: #0d6efd;
+        }
+
+        .bet-option img {
+            max-width: 80%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        .bet-amount {
+            font-weight: bold;
+            color: #dc3545;
+            background-color: rgba(255, 255, 0, 0.7);
+            padding: 2px 8px;
+            border-radius: 5px;
+        }
+
+        .bet-option.selected {
+            border-color: #198754;
+            background-color: #e9f5e9;
+            box-shadow: 0 4px 20px rgba(25, 135, 84, 0.4);
+        }
+
+        #dice-section img {
+            height: 90px;
+            width: 90px;
+            object-fit: contain;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
         
-        @media (max-width: 1024px) { .main-layout { grid-template-columns: 1fr; } }
+        #history-list li {
+            padding: 5px;
+            border-bottom: 1px solid #ccc;
+        }
     </style>
 </head>
 <body>
 
-<main class="container" id="login-screen">
-    <article class="card">
-        <h1>Quản Lý Tài Khoản</h1>
-        <div id="accounts-section">
-            <h2>Chọn tài khoản hiện có</h2>
-            <div id="existing-accounts-list">
+    <div id="login-screen" class="auth-body">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <img src="images/logo.png" alt="Curry88 Logo" class="img-fluid" style="max-width: 150px;">
+                    </div>
+                    <h3 class="card-title text-center mb-4">Đăng Nhập</h3>
+                    <form id="login-form">
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="username" placeholder="Tên đăng nhập" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="password" class="form-control" id="password" placeholder="Mật khẩu" required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary fw-bold">Đăng nhập</button>
+                        </div>
+                    </form>
+                    <div class="text-center mt-3">
+                        <p class="mb-0">Chưa có tài khoản? <a href="#" id="show-register">Đăng ký ngay</a></p>
+                    </div>
                 </div>
-            <p id="no-accounts-msg" style="display: none; text-align: center;">Chưa có tài khoản nào. Hãy tạo một tài khoản mới!</p>
-        </div>
-        <form id="create-account-form">
-            <h2>Tạo tài khoản mới</h2>
-            <input type="text" id="username-input" placeholder="Nhập tên tài khoản mới" required>
-            <button type="submit">Tạo và Chơi</button>
-        </form>
-         <button id="play-guest-btn" class="secondary" style="width: 100%; margin-top: 1rem;">Chơi với tư cách khách</button>
-    </article>
-</main>
-
-<div id="game-container" class="main-layout">
-    <article id="game-board" class="card">
-        <h2>Bàn Cược</h2>
-        <div class="player-info">
-            <span id="player-name"></span>
-            <button id="logout-btn" class="secondary outline" style="padding: 5px 10px;">Đăng Xuất</button>
-            <span id="balance"></span>
-        </div>
-        <div class="grid">
-            <div><label>Mức cược: <input type="number" id="bet-amount" value="50" min="1"></label></div>
-            <div style="text-align:center;">
-                <div id="dice-container">
-                    <div class="dice" id="dice1">?</div><div class="dice" id="dice2">?</div><div class="dice" id="dice3">?</div>
-                </div>
-                <div id="result-text"><span id="result-message">Hãy đặt cược!</span><div id="countdown-timer"></div></div>
             </div>
         </div>
-        <div class="betting-area" style="margin-top: 1.5rem;">
-            <div class="grid"><button class="bet-option" data-bet-type="xiu">XỈU<div style="font-size:0.8rem; opacity:0.8;">4-10 (1:1)</div></button>
-            <button class="bet-option" data-bet-type="tai">TÀI<div style="font-size:0.8rem; opacity:0.8;">11-17 (1:1)</div></button></div>
+    </div>
+
+    <div id="register-screen" class="auth-body d-none">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <img src="images/logo.png" alt="Curry88 Logo" class="img-fluid" style="max-width: 150px;">
+                    </div>
+                    <h3 class="card-title text-center mb-4">Đăng Ký Tài Khoản</h3>
+                    <form id="register-form">
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="new-username" placeholder="Tên đăng nhập" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="password" class="form-control" id="new-password" placeholder="Mật khẩu" required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success fw-bold">Đăng ký</button>
+                        </div>
+                    </form>
+                    <div class="text-center mt-3">
+                        <p class="mb-0">Đã có tài khoản? <a href="#" id="show-login">Đăng nhập</a></p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="controls" style="margin-top: 1.5rem">
-            <button id="roll-btn" style="background-color: var(--secondary-color); color: #000;">Lắc Xúc Xắc</button>
-            <button id="reset-btn" class="secondary" disabled>Cược Lại</button>
-        </div>
-    </article>
-    <article id="history-panel" class="card"><h2>Lịch Sử Cược</h2><div class="overflow-auto"><table id="history-table"><thead><tr><th>Ván</th><th>Xúc Xắc</th><th>Tổng</th><th>Kết Quả</th><th>+/- Điểm</th></tr></thead><tbody id="history-body"></tbody></table></div></article>
-</div>
-
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    // --- Elements ---
-    const loginScreen = document.getElementById('login-screen');
-    const createAccountForm = document.getElementById('create-account-form');
-    const usernameInput = document.getElementById('username-input');
-    const existingAccountsList = document.getElementById('existing-accounts-list');
-    const noAccountsMsg = document.getElementById('no-accounts-msg');
-    const playGuestBtn = document.getElementById('play-guest-btn');
-    const gameContainer = document.getElementById('game-container');
-    const playerNameElem = document.getElementById('player-name');
-    const logoutBtn = document.getElementById('logout-btn');
-    const balanceElem = document.getElementById('balance');
-    const betAmountInput = document.getElementById('bet-amount');
-    const diceElems = [document.getElementById('dice1'), document.getElementById('dice2'), document.getElementById('dice3')];
-    const resultMessageElem = document.getElementById('result-message');
-    const countdownTimerElem = document.getElementById('countdown-timer');
-    const betOptions = document.querySelectorAll('.bet-option');
-    const rollBtn = document.getElementById('roll-btn');
-    const resetBtn = document.getElementById('reset-btn');
-    const historyBody = document.getElementById('history-body');
-
-    // --- Game State ---
-    let accounts = [];
-    let currentPlayer = null;
-    let playerBalance = 1000;
-    let bets = {};
-    let isRoundActive = false;
-    let countdownIntervalId = null;
-    let gameHistory = [];
-    let roundCounter = 0;
-    const PAYOUTS = { tai: 1, xiu: 1 };
-
-    // --- ACCOUNT MANAGEMENT FUNCTIONS ---
-    const getAccounts = () => JSON.parse(localStorage.getItem('sicbo_accounts')) || [];
-    const saveAccounts = (updatedAccounts) => localStorage.setItem('sicbo_accounts', JSON.stringify(updatedAccounts));
-
-    const displayAccounts = () => {
-        accounts = getAccounts();
-        existingAccountsList.innerHTML = '';
-        if (accounts.length === 0) {
-            noAccountsMsg.style.display = 'block';
-        } else {
-            noAccountsMsg.style.display = 'none';
-            accounts.forEach(acc => {
-                const item = document.createElement('div');
-                item.className = 'account-item';
-                item.innerHTML = `
-                    <span><strong>${acc.name}</strong> - Điểm: ${acc.balance}</span>
-                    <button class="delete-btn" data-name="${acc.name}">&times;</button>
-                `;
-                item.querySelector('span').addEventListener('click', () => login(acc.name));
-                item.querySelector('.delete-btn').addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    deleteAccount(acc.name);
-                });
-                existingAccountsList.appendChild(item);
-            });
-        }
-    };
+    </div>
     
-    const createAccount = (name) => {
-        if (!name) return;
-        accounts = getAccounts();
-        if (accounts.some(acc => acc.name.toLowerCase() === name.toLowerCase())) {
-            alert('Tên tài khoản này đã tồn tại!');
-            return;
-        }
-        const newAccount = { name: name, balance: 1000, history: [] };
-        accounts.push(newAccount);
-        saveAccounts(accounts);
-        login(name);
-    };
-
-    const deleteAccount = (name) => {
-        if (confirm(`Bạn có chắc muốn xóa vĩnh viễn tài khoản "${name}"?`)) {
-            let currentAccounts = getAccounts();
-            currentAccounts = currentAccounts.filter(acc => acc.name !== name);
-            saveAccounts(currentAccounts);
-            displayAccounts();
-        }
-    };
-
-    const login = (name) => {
-        accounts = getAccounts();
-        const account = accounts.find(acc => acc.name === name);
-        if (account) {
-            currentPlayer = account;
-            playerBalance = account.balance;
-            gameHistory = account.history || [];
-            roundCounter = gameHistory.length;
-        }
-        playerNameElem.textContent = currentPlayer.name;
-        updateBalance(playerBalance);
-        renderHistoryTable();
-        loginScreen.style.display = 'none';
-        gameContainer.style.display = 'grid';
-    };
-
-    const playAsGuest = () => {
-        currentPlayer = { name: 'Khách', balance: 1000, history: [] }; // Guest session object
-        playerBalance = 1000;
-        gameHistory = [];
-        roundCounter = 0;
-        playerNameElem.textContent = "Chế độ Khách";
-        updateBalance(playerBalance);
-        renderHistoryTable();
-        loginScreen.style.display = 'none';
-        gameContainer.style.display = 'grid';
-    };
-
-    const logout = () => {
-        if (currentPlayer && currentPlayer.name !== 'Khách') {
-             saveCurrentPlayerState();
-        }
-        currentPlayer = null;
-        gameContainer.style.display = 'none';
-        loginScreen.style.display = 'block';
-        resetBoard(true); // Reset board silently
-        displayAccounts(); // Refresh account list
-    };
-
-    const saveCurrentPlayerState = () => {
-        if (!currentPlayer || currentPlayer.name === 'Khách') return;
-        const accountIndex = accounts.findIndex(acc => acc.name === currentPlayer.name);
-        if (accountIndex !== -1) {
-            accounts[accountIndex].balance = playerBalance;
-            accounts[accountIndex].history = gameHistory;
-            saveAccounts(accounts);
-        }
-    };
+    <div id="game-screen" class="d-none">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                    <img src="images/logo.png" alt="Curry88 Logo" height="40">
+                </a>
+                <div class="ms-auto text-white">
+                    <span class="me-3">Chào, <strong id="player-name" class="text-warning"></strong></span>
+                    <span class="me-3">|</span>
+                    <span class="me-3">💰 Số dư: <strong id="player-balance" class="text-success"></strong></span>
+                    <button id="logout-btn" class="btn btn-danger btn-sm">Đăng xuất</button>
+                </div>
+            </div>
+        </nav>
     
-    // --- GAME LOGIC FUNCTIONS (with modifications) ---
-    const updateBalance = (amount) => {
-        playerBalance = amount;
-        balanceElem.textContent = `Điểm: ${playerBalance}`;
-    };
+        <main class="container my-4">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div id="game-board-container" class="p-3 rounded bg-light shadow">
+                        <h2 class="text-center mb-3">Bàn Cược</h2>
+                        <div id="game-board" class="row g-3">
+                            </div>
+                    </div>
+                </div>
+    
+                <div class="col-lg-4">
+                    <div class="p-3 rounded bg-light shadow">
+                        <h2 class="text-center mb-3">Xúc Xắc</h2>
+                        <div id="dice-section" class="mb-4 d-flex justify-content-center align-items-center" style="min-height: 150px;">
+                            <h3 id="initial-text">Hãy đặt cược và xóc!</h3>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button id="roll-btn" class="btn btn-primary btn-lg fw-bold">⚡ XÓC NGAY! ⚡</button>
+                            <button id="reset-btn" class="btn btn-info btn-sm">Chơi lại</button>
+                        </div>
+                    </div>
+                     <div id="history" class="mt-3 p-3 rounded bg-light shadow">
+                        <h4 class="text-center">Lịch sử ván đấu</h4>
+                        <ul id="history-list" class="list-unstyled text-center"></ul>
+                     </div>
+                </div>
+            </div>
+        </main>
+    </div>
 
-    const checkWinnings = (dice, total) => {
-        // ... (rest of checkWinnings is the same as before)
-        const isTriple = dice[0] === dice[1] && dice[1] === dice[2];
-        let totalWinnings = 0;
-        const totalBetAmount = Object.values(bets).reduce((sum, amount) => sum + amount, 0);
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
 
-        for (const betType in bets) {
-            const betAmount = bets[betType];
-            let won = false;
-            if (betType === 'tai' && total >= 11 && total <= 17 && !isTriple) won = true;
-            else if (betType === 'xiu' && total >= 4 && total <= 10 && !isTriple) won = true;
+            const loginScreen = document.getElementById('login-screen');
+            const registerScreen = document.getElementById('register-screen');
+            const gameScreen = document.getElementById('game-screen');
             
-            const betElem = document.querySelector(`[data-bet-type='${betType}']`);
-            if (won) {
-                totalWinnings += betAmount + (betAmount * PAYOUTS[betType]);
-                betElem.classList.add('win');
-            } else {
-                betElem.classList.add('lose');
+            const showRegisterLink = document.getElementById('show-register');
+            const showLoginLink = document.getElementById('show-login');
+
+            let currentUser = null;
+
+            //============= PHẦN ĐIỀU HƯỚNG MÀN HÌNH =============//
+            
+            function showScreen(screenId) {
+                loginScreen.classList.add('d-none');
+                registerScreen.classList.add('d-none');
+                gameScreen.classList.add('d-none');
+
+                document.getElementById(screenId).classList.remove('d-none');
             }
-        }
 
-        const newBalance = playerBalance + totalWinnings;
-        updateBalance(newBalance); // Update UI
-        const netChange = totalWinnings - totalBetAmount;
-        
-        let resultString = `Tổng: ${total}. `;
-        if (netChange > 0) resultString += `Thắng ${netChange} điểm!`;
-        else if (netChange < 0) resultString += `Thua ${Math.abs(netChange)} điểm.`;
-        else resultString += "Hòa vốn.";
-        
-        resultMessageElem.textContent = resultString;
-        updateHistory(dice, total, isTriple, netChange);
-        saveCurrentPlayerState(); // Save after every round
-        startNewRoundTimer(5);
-    };
-    
-    const updateHistory = (dice, total, isTriple, netChange) => {
-        roundCounter++;
-        const historyEntry = {
-            round: roundCounter,
-            dice: dice.join('-'),
-            total: total,
-            result: isTriple ? "Bộ Ba" : (total > 10 ? "Tài" : "Xỉu"),
-            change: netChange,
-        };
-        gameHistory.unshift(historyEntry);
-        if (gameHistory.length > 15) gameHistory.pop();
-        renderHistoryTable();
-    };
+            showRegisterLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                showScreen('register-screen');
+            });
+            
+            showLoginLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                showScreen('login-screen');
+            });
 
-    const renderHistoryTable = () => {
-        historyBody.innerHTML = '';
-        gameHistory.forEach(entry => {
-            const row = document.createElement('tr');
-            let changeClass = entry.change > 0 ? 'win' : (entry.change < 0 ? 'loss' : '');
-            row.innerHTML = `
-                <td>#${entry.round}</td>
-                <td class="dice-result">${entry.dice}</td>
-                <td>${entry.total}</td>
-                <td><b>${entry.result}</b></td>
-                <td class="${changeClass}">${entry.change > 0 ? '+' : ''}${entry.change}</td>
-            `;
-            historyBody.appendChild(row);
+
+            //============= PHẦN XỬ LÝ ĐĂNG NHẬP / ĐĂNG KÝ =============//
+            
+            // Xử lý Form đăng ký
+            const registerForm = document.getElementById('register-form');
+            registerForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const username = document.getElementById('new-username').value;
+                const password = document.getElementById('new-password').value;
+
+                let users = JSON.parse(localStorage.getItem('bau_cua_users')) || [];
+
+                if (users.some(u => u.username === username)) {
+                    alert('Tên đăng nhập đã tồn tại!');
+                    return;
+                }
+
+                users.push({ username, password, balance: 10000 });
+                localStorage.setItem('bau_cua_users', JSON.stringify(users));
+                alert('Đăng ký thành công! Vui lòng đăng nhập.');
+                showScreen('login-screen');
+            });
+
+            // Xử lý Form đăng nhập
+            const loginForm = document.getElementById('login-form');
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                const users = JSON.parse(localStorage.getItem('bau_cua_users')) || [];
+                const user = users.find(u => u.username === username && u.password === password);
+
+                if (user) {
+                    currentUser = {
+                        username: user.username,
+                        balance: user.balance !== undefined ? user.balance : 10000
+                    };
+                    sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    startGame();
+                } else {
+                    alert('Tên đăng nhập hoặc mật khẩu không đúng!');
+                }
+            });
+
+
+            //============= PHẦN XỬ LÝ GAME =============//
+
+            function startGame() {
+                showScreen('game-screen');
+
+                const gameItems = [
+                    { id: 'bau', name: 'Bầu' }, { id: 'cua', name: 'Cua' },
+                    { id: 'tom', name: 'Tôm' }, { id: 'ca', name: 'Cá' },
+                    { id: 'ga', name: 'Gà' }, { id: 'nai', name: 'Nai' }
+                ];
+
+                const gameBoard = document.getElementById('game-board');
+                const diceSection = document.getElementById('dice-section');
+                const rollBtn = document.getElementById('roll-btn');
+                const resetBtn = document.getElementById('reset-btn');
+                const playerNameSpan = document.getElementById('player-name');
+                const playerBalanceSpan = document.getElementById('player-balance');
+                const logoutBtn = document.getElementById('logout-btn');
+                const historyList = document.getElementById('history-list');
+
+                let currentBets = {};
+
+                function initializeBoard() {
+                    gameBoard.innerHTML = '';
+                    gameItems.forEach(item => {
+                        const betDiv = document.createElement('div');
+                        betDiv.className = 'col-6 col-md-4 text-center';
+                        betDiv.innerHTML = `
+                            <div class="bet-option p-3" data-item="${item.id}">
+                                <img src="images/${item.id}.png" class="img-fluid">
+                                <div class="bet-amount mt-2">Cược: <span id="bet-${item.id}">0</span></div>
+                            </div>
+                        `;
+                        gameBoard.appendChild(betDiv);
+                    });
+                    updateUI();
+                }
+
+                function updateUI() {
+                    if (!currentUser) return;
+                    playerNameSpan.textContent = currentUser.username;
+                    playerBalanceSpan.textContent = currentUser.balance.toLocaleString('vi-VN') + 'đ';
+                    gameItems.forEach(item => {
+                        const betAmountSpan = document.getElementById(`bet-${item.id}`);
+                        if (betAmountSpan) {
+                           betAmountSpan.textContent = (currentBets[item.id] || 0).toLocaleString('vi-VN') + 'đ';
+                           const betOptionDiv = betAmountSpan.closest('.bet-option');
+                           if (currentBets[item.id] > 0) {
+                               betOptionDiv.classList.add('selected');
+                           } else {
+                               betOptionDiv.classList.remove('selected');
+                           }
+                        }
+                    });
+                }
+                
+                function saveUserState() {
+                    if (!currentUser) return;
+                    sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    
+                    let users = JSON.parse(localStorage.getItem('bau_cua_users')) || [];
+                    let userIndex = users.findIndex(u => u.username === currentUser.username);
+                    if(userIndex !== -1) {
+                        users[userIndex].balance = currentUser.balance;
+                        localStorage.setItem('bau_cua_users', JSON.stringify(users));
+                    }
+                }
+
+                gameBoard.addEventListener('click', (e) => {
+                    const betOption = e.target.closest('.bet-option');
+                    if (betOption) {
+                        const item = betOption.dataset.item;
+                        const betAmount = 1000;
+
+                        if (currentUser.balance >= betAmount) {
+                            currentUser.balance -= betAmount;
+                            currentBets[item] = (currentBets[item] || 0) + betAmount;
+                            updateUI();
+                        } else {
+                            alert('Không đủ tiền!');
+                        }
+                    }
+                });
+
+                rollBtn.addEventListener('click', () => {
+                    if (Object.keys(currentBets).length === 0) {
+                        alert('Vui lòng đặt cược trước khi xóc!');
+                        return;
+                    }
+
+                    rollBtn.disabled = true;
+                    diceSection.innerHTML = `<img src="images/dice-roll.gif" alt="Đang xóc..." style="height: 120px;">`;
+
+                    setTimeout(() => {
+                        const result = [
+                            gameItems[Math.floor(Math.random() * 6)],
+                            gameItems[Math.floor(Math.random() * 6)],
+                            gameItems[Math.floor(Math.random() * 6)]
+                        ];
+
+                        displayResults(result);
+                        calculateWinnings(result);
+                        updateUI();
+                        saveUserState();
+
+                        rollBtn.disabled = false;
+                    }, 2000);
+                });
+                
+                function displayResults(result) {
+                    diceSection.innerHTML = '';
+                    let historyHTML = '';
+                    result.forEach(item => {
+                        diceSection.innerHTML += `<img src="images/${item.id}.png" alt="${item.name}" class="mx-2">`;
+                        historyHTML += `<img src="images/${item.id}.png" width="20" class="mx-1">`;
+                    });
+                    
+                    const li = document.createElement('li');
+                    li.innerHTML = historyHTML;
+                    historyList.prepend(li);
+                    if(historyList.children.length > 5) {
+                        historyList.removeChild(historyList.lastChild);
+                    }
+                }
+                
+                function calculateWinnings(result) {
+                    let winnings = 0;
+                    const resultCounts = {};
+                    result.forEach(item => { resultCounts[item.id] = (resultCounts[item.id] || 0) + 1; });
+
+                    for (const betItem in currentBets) {
+                        if (resultCounts[betItem]) {
+                            const count = resultCounts[betItem];
+                            const betAmount = currentBets[betItem];
+                            winnings += betAmount * (count + 1);
+                        }
+                    }
+                    
+                    if (winnings > 0) {
+                        alert(`🎉 Chúc mừng! Bạn đã thắng ${winnings.toLocaleString('vi-VN')}đ`);
+                    } else {
+                        alert(`😥 Rất tiếc, bạn không thắng vòng này.`);
+                    }
+
+                    currentUser.balance += winnings;
+                    currentBets = {};
+                }
+
+                resetBtn.addEventListener('click', () => {
+                    for (const item in currentBets) {
+                        currentUser.balance += currentBets[item];
+                    }
+                    currentBets = {};
+                    updateUI();
+                    alert('Đã hoàn lại tiền cược và reset bàn.');
+                });
+                
+                logoutBtn.addEventListener('click', () => {
+                    saveUserState();
+                    sessionStorage.removeItem('currentUser');
+                    currentUser = null;
+                    showScreen('login-screen');
+                });
+                
+                initializeBoard();
+            }
+
+            //============= KIỂM TRA PHIÊN ĐĂNG NHẬP =============//
+            const savedUser = sessionStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                startGame();
+            } else {
+                showScreen('login-screen');
+            }
         });
-    };
-
-    const resetBoard = (isSilent = false) => {
-        clearInterval(countdownIntervalId);
-        countdownIntervalId = null;
-        bets = {};
-        betOptions.forEach(opt => {
-            opt.classList.remove('selected', 'win', 'lose');
-            const display = opt.querySelector('.bet-placed-display');
-            if (display) display.remove();
-        });
-        diceElems.forEach(d => d.textContent = '?');
-        resultMessageElem.textContent = "Hãy đặt cược cho ván mới!";
-        countdownTimerElem.textContent = '';
-        toggleControls(false);
-
-        if (!isSilent && playerBalance <= 0) {
-            alert("Bạn đã hết điểm! Tặng bạn 500 điểm để chơi tiếp.");
-            updateBalance(500);
-            saveCurrentPlayerState();
-        }
-    };
-    
-    // --- Initial Setup and Event Listeners ---
-    displayAccounts(); // Initial call
-    
-    createAccountForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        createAccount(usernameInput.value.trim());
-        usernameInput.value = '';
-    });
-
-    playGuestBtn.addEventListener('click', playAsGuest);
-    logoutBtn.addEventListener('click', logout);
-    
-    // Attach other game listeners (same as before)
-    const rollDice = () => { /* ... same as before ... */
-        if (Object.keys(bets).length === 0) { alert("Vui lòng đặt cược!"); return; }
-        toggleControls(true); resultMessageElem.textContent = "Đang lắc...";
-        let rollCount = 0;
-        const rollInterval = setInterval(() => {
-            diceElems.forEach(d => d.textContent = Math.floor(Math.random() * 6) + 1);
-            if (++rollCount > 20) { clearInterval(rollInterval); finalizeRoll(); }
-        }, 100);
-    };
-    const finalizeRoll = () => { /* ... same as before ... */
-        const dice = [1, 2, 3].map(() => Math.floor(Math.random() * 6) + 1);
-        const total = dice.reduce((a, b) => a + b);
-        dice.forEach((val, i) => diceElems[i].textContent = val);
-        checkWinnings(dice, total);
-    };
-    const placeBet = (betType, amount) => { /* ... same as before ... */
-        if (isRoundActive) return;
-        if (amount <= 0) { alert("Mức cược không hợp lệ!"); return; }
-        if (amount > playerBalance) { alert("Không đủ điểm!"); return; }
-        updateBalance(playerBalance - amount);
-        bets[betType] = (bets[betType] || 0) + amount;
-        const betOptionElem = document.querySelector(`[data-bet-type='${betType}']`);
-        betOptionElem.classList.add('selected');
-        let display = betOptionElem.querySelector('.bet-placed-display');
-        if (!display) {
-            display = document.createElement('div');
-            display.className = 'bet-placed-display';
-            betOptionElem.appendChild(display);
-        }
-        display.textContent = bets[betType];
-    };
-    const startNewRoundTimer = (seconds) => { /* ... same as before ... */
-        let remaining = seconds;
-        countdownTimerElem.textContent = `Ván mới sau: ${remaining}s`;
-        countdownIntervalId = setInterval(() => {
-            remaining--;
-            countdownTimerElem.textContent = `Ván mới sau: ${remaining}s`;
-            if (remaining <= 0) resetBoard();
-        }, 1000);
-    };
-    const toggleControls = (active) => { /* ... same as before ... */
-        isRoundActive = active;
-        rollBtn.disabled = active;
-        resetBtn.disabled = !active;
-        betAmountInput.disabled = active;
-        betOptions.forEach(b => b.disabled = active);
-    };
-
-    betOptions.forEach(option => {
-        option.addEventListener('click', () => {
-            const betType = option.dataset.betType;
-            const amount = parseInt(betAmountInput.value);
-            placeBet(betType, amount);
-        });
-    });
-    rollBtn.addEventListener('click', rollDice);
-    resetBtn.addEventListener('click', () => resetBoard(false));
-});
-</script>
-
+    </script>
 </body>
 </html>
