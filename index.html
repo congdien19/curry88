@@ -5,87 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bầu Cua Curry88 - All in One</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        body {
-            background-color: #f0f2f5;
-        }
-
+        /* ... CSS hiện tại của bạn ... */
         .auth-body {
             background: linear-gradient(to right, #6a11cb, #2575fc);
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            flex-direction: column; /* Để logo và tiêu đề xếp dọc */
         }
-        
-        #game-screen {
-            background-color: #e9ecef;
-        }
-
-        .bet-option {
-            border: 3px solid #dee2e6;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            background-color: #fff;
-            border-radius: 10px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .bet-option:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border-color: #0d6efd;
-        }
-
-        .bet-option img {
-            max-width: 80%;
-            height: auto;
-            margin-bottom: 10px;
-        }
-
-        .bet-amount {
-            font-weight: bold;
-            color: #dc3545;
-            background-color: rgba(255, 255, 0, 0.7);
-            padding: 2px 8px;
-            border-radius: 5px;
-        }
-
-        .bet-option.selected {
-            border-color: #198754;
-            background-color: #e9f5e9;
-            box-shadow: 0 4px 20px rgba(25, 135, 84, 0.4);
-        }
-
-        #dice-section img {
-            height: 90px;
-            width: 90px;
-            object-fit: contain;
-            animation: fadeIn 0.5s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.5); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        
-        #history-list li {
-            padding: 5px;
-            border-bottom: 1px solid #ccc;
+        .auth-logo {
+            margin-bottom: 1rem;
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
     <div id="login-screen" class="auth-body">
+        <div class="auth-logo">
+            <i class="fas fa-dice-d6 fa-3x text-warning"></i>
+            <h1 class="text-light mt-2">Curry88</h1>
+        </div>
         <div class="col-md-6 col-lg-4">
             <div class="card shadow-lg border-0">
                 <div class="card-body p-4">
-                    <div class="text-center mb-4">
-                        <img src="images/logo.png" alt="Curry88 Logo" class="img-fluid" style="max-width: 150px;">
-                    </div>
                     <h3 class="card-title text-center mb-4">Đăng Nhập</h3>
                     <form id="login-form">
                         <div class="mb-3">
@@ -107,12 +53,13 @@
     </div>
 
     <div id="register-screen" class="auth-body d-none">
+        <div class="auth-logo">
+            <i class="fas fa-dice-d6 fa-3x text-success"></i>
+            <h1 class="text-light mt-2">Curry88</h1>
+        </div>
         <div class="col-md-6 col-lg-4">
             <div class="card shadow-lg border-0">
                 <div class="card-body p-4">
-                    <div class="text-center mb-4">
-                        <img src="images/logo.png" alt="Curry88 Logo" class="img-fluid" style="max-width: 150px;">
-                    </div>
                     <h3 class="card-title text-center mb-4">Đăng Ký Tài Khoản</h3>
                     <form id="register-form">
                         <div class="mb-3">
@@ -132,32 +79,68 @@
             </div>
         </div>
     </div>
-    
+
     <div id="game-screen" class="d-none">
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
             <div class="container">
                 <a class="navbar-brand" href="#">
-                    <img src="images/logo.png" alt="Curry88 Logo" height="40">
+                    <i class="fas fa-dice-d6 fa-lg text-warning me-2"></i> Curry88
                 </a>
                 <div class="ms-auto text-white">
                     <span class="me-3">Chào, <strong id="player-name" class="text-warning"></strong></span>
                     <span class="me-3">|</span>
                     <span class="me-3">💰 Số dư: <strong id="player-balance" class="text-success"></strong></span>
-                    <button id="logout-btn" class="btn btn-danger btn-sm">Đăng xuất</button>
+                    <button id="logout-btn" class="btn btn-danger btn-sm"><i class="fas fa-sign-out-alt me-1"></i> Đăng xuất</button>
                 </div>
             </div>
         </nav>
-    
+
         <main class="container my-4">
             <div class="row">
                 <div class="col-lg-8">
                     <div id="game-board-container" class="p-3 rounded bg-light shadow">
                         <h2 class="text-center mb-3">Bàn Cược</h2>
                         <div id="game-board" class="row g-3">
+                            <div class="col-6 col-md-4 text-center">
+                                <div class="bet-option p-3" data-item="bau">
+                                    <img src="images/bau.png" class="img-fluid">
+                                    <div class="bet-amount mt-2">Cược: <span id="bet-bau">0</span></div>
+                                </div>
                             </div>
+                            <div class="col-6 col-md-4 text-center">
+                                <div class="bet-option p-3" data-item="cua">
+                                    <img src="images/cua.png" class="img-fluid">
+                                    <div class="bet-amount mt-2">Cược: <span id="bet-cua">0</span></div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-4 text-center">
+                                <div class="bet-option p-3" data-item="tom">
+                                    <img src="images/tom.png" class="img-fluid">
+                                    <div class="bet-amount mt-2">Cược: <span id="bet-tom">0</span></div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-4 text-center">
+                                <div class="bet-option p-3" data-item="ca">
+                                    <img src="images/ca.png" class="img-fluid">
+                                    <div class="bet-amount mt-2">Cược: <span id="bet-ca">0</span></div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-4 text-center">
+                                <div class="bet-option p-3" data-item="ga">
+                                    <img src="images/ga.png" class="img-fluid">
+                                    <div class="bet-amount mt-2">Cược: <span id="bet-ga">0</span></div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-4 text-center">
+                                <div class="bet-option p-3" data-item="nai">
+                                    <img src="images/nai.png" class="img-fluid">
+                                    <div class="bet-amount mt-2">Cược: <span id="bet-nai">0</span></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-    
+
                 <div class="col-lg-4">
                     <div class="p-3 rounded bg-light shadow">
                         <h2 class="text-center mb-3">Xúc Xắc</h2>
@@ -166,7 +149,7 @@
                         </div>
                         <div class="d-grid gap-2">
                             <button id="roll-btn" class="btn btn-primary btn-lg fw-bold">⚡ XÓC NGAY! ⚡</button>
-                            <button id="reset-btn" class="btn btn-info btn-sm">Chơi lại</button>
+                            <button id="reset-btn" class="btn btn-info btn-sm"><i class="fas fa-undo me-1"></i> Chơi lại</button>
                         </div>
                     </div>
                      <div id="history" class="mt-3 p-3 rounded bg-light shadow">
@@ -179,261 +162,9 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-
-            const loginScreen = document.getElementById('login-screen');
-            const registerScreen = document.getElementById('register-screen');
-            const gameScreen = document.getElementById('game-screen');
-            
-            const showRegisterLink = document.getElementById('show-register');
-            const showLoginLink = document.getElementById('show-login');
-
-            let currentUser = null;
-
-            //============= PHẦN ĐIỀU HƯỚNG MÀN HÌNH =============//
-            
-            function showScreen(screenId) {
-                loginScreen.classList.add('d-none');
-                registerScreen.classList.add('d-none');
-                gameScreen.classList.add('d-none');
-
-                document.getElementById(screenId).classList.remove('d-none');
-            }
-
-            showRegisterLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                showScreen('register-screen');
-            });
-            
-            showLoginLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                showScreen('login-screen');
-            });
-
-
-            //============= PHẦN XỬ LÝ ĐĂNG NHẬP / ĐĂNG KÝ =============//
-            
-            // Xử lý Form đăng ký
-            const registerForm = document.getElementById('register-form');
-            registerForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const username = document.getElementById('new-username').value;
-                const password = document.getElementById('new-password').value;
-
-                let users = JSON.parse(localStorage.getItem('bau_cua_users')) || [];
-
-                if (users.some(u => u.username === username)) {
-                    alert('Tên đăng nhập đã tồn tại!');
-                    return;
-                }
-
-                users.push({ username, password, balance: 10000 });
-                localStorage.setItem('bau_cua_users', JSON.stringify(users));
-                alert('Đăng ký thành công! Vui lòng đăng nhập.');
-                showScreen('login-screen');
-            });
-
-            // Xử lý Form đăng nhập
-            const loginForm = document.getElementById('login-form');
-            loginForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
-
-                const users = JSON.parse(localStorage.getItem('bau_cua_users')) || [];
-                const user = users.find(u => u.username === username && u.password === password);
-
-                if (user) {
-                    currentUser = {
-                        username: user.username,
-                        balance: user.balance !== undefined ? user.balance : 10000
-                    };
-                    sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    startGame();
-                } else {
-                    alert('Tên đăng nhập hoặc mật khẩu không đúng!');
-                }
-            });
-
-
-            //============= PHẦN XỬ LÝ GAME =============//
-
-            function startGame() {
-                showScreen('game-screen');
-
-                const gameItems = [
-                    { id: 'bau', name: 'Bầu' }, { id: 'cua', name: 'Cua' },
-                    { id: 'tom', name: 'Tôm' }, { id: 'ca', name: 'Cá' },
-                    { id: 'ga', name: 'Gà' }, { id: 'nai', name: 'Nai' }
-                ];
-
-                const gameBoard = document.getElementById('game-board');
-                const diceSection = document.getElementById('dice-section');
-                const rollBtn = document.getElementById('roll-btn');
-                const resetBtn = document.getElementById('reset-btn');
-                const playerNameSpan = document.getElementById('player-name');
-                const playerBalanceSpan = document.getElementById('player-balance');
-                const logoutBtn = document.getElementById('logout-btn');
-                const historyList = document.getElementById('history-list');
-
-                let currentBets = {};
-
-                function initializeBoard() {
-                    gameBoard.innerHTML = '';
-                    gameItems.forEach(item => {
-                        const betDiv = document.createElement('div');
-                        betDiv.className = 'col-6 col-md-4 text-center';
-                        betDiv.innerHTML = `
-                            <div class="bet-option p-3" data-item="${item.id}">
-                                <img src="images/${item.id}.png" class="img-fluid">
-                                <div class="bet-amount mt-2">Cược: <span id="bet-${item.id}">0</span></div>
-                            </div>
-                        `;
-                        gameBoard.appendChild(betDiv);
-                    });
-                    updateUI();
-                }
-
-                function updateUI() {
-                    if (!currentUser) return;
-                    playerNameSpan.textContent = currentUser.username;
-                    playerBalanceSpan.textContent = currentUser.balance.toLocaleString('vi-VN') + 'đ';
-                    gameItems.forEach(item => {
-                        const betAmountSpan = document.getElementById(`bet-${item.id}`);
-                        if (betAmountSpan) {
-                           betAmountSpan.textContent = (currentBets[item.id] || 0).toLocaleString('vi-VN') + 'đ';
-                           const betOptionDiv = betAmountSpan.closest('.bet-option');
-                           if (currentBets[item.id] > 0) {
-                               betOptionDiv.classList.add('selected');
-                           } else {
-                               betOptionDiv.classList.remove('selected');
-                           }
-                        }
-                    });
-                }
-                
-                function saveUserState() {
-                    if (!currentUser) return;
-                    sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    
-                    let users = JSON.parse(localStorage.getItem('bau_cua_users')) || [];
-                    let userIndex = users.findIndex(u => u.username === currentUser.username);
-                    if(userIndex !== -1) {
-                        users[userIndex].balance = currentUser.balance;
-                        localStorage.setItem('bau_cua_users', JSON.stringify(users));
-                    }
-                }
-
-                gameBoard.addEventListener('click', (e) => {
-                    const betOption = e.target.closest('.bet-option');
-                    if (betOption) {
-                        const item = betOption.dataset.item;
-                        const betAmount = 1000;
-
-                        if (currentUser.balance >= betAmount) {
-                            currentUser.balance -= betAmount;
-                            currentBets[item] = (currentBets[item] || 0) + betAmount;
-                            updateUI();
-                        } else {
-                            alert('Không đủ tiền!');
-                        }
-                    }
-                });
-
-                rollBtn.addEventListener('click', () => {
-                    if (Object.keys(currentBets).length === 0) {
-                        alert('Vui lòng đặt cược trước khi xóc!');
-                        return;
-                    }
-
-                    rollBtn.disabled = true;
-                    diceSection.innerHTML = `<img src="images/dice-roll.gif" alt="Đang xóc..." style="height: 120px;">`;
-
-                    setTimeout(() => {
-                        const result = [
-                            gameItems[Math.floor(Math.random() * 6)],
-                            gameItems[Math.floor(Math.random() * 6)],
-                            gameItems[Math.floor(Math.random() * 6)]
-                        ];
-
-                        displayResults(result);
-                        calculateWinnings(result);
-                        updateUI();
-                        saveUserState();
-
-                        rollBtn.disabled = false;
-                    }, 2000);
-                });
-                
-                function displayResults(result) {
-                    diceSection.innerHTML = '';
-                    let historyHTML = '';
-                    result.forEach(item => {
-                        diceSection.innerHTML += `<img src="images/${item.id}.png" alt="${item.name}" class="mx-2">`;
-                        historyHTML += `<img src="images/${item.id}.png" width="20" class="mx-1">`;
-                    });
-                    
-                    const li = document.createElement('li');
-                    li.innerHTML = historyHTML;
-                    historyList.prepend(li);
-                    if(historyList.children.length > 5) {
-                        historyList.removeChild(historyList.lastChild);
-                    }
-                }
-                
-                function calculateWinnings(result) {
-                    let winnings = 0;
-                    const resultCounts = {};
-                    result.forEach(item => { resultCounts[item.id] = (resultCounts[item.id] || 0) + 1; });
-
-                    for (const betItem in currentBets) {
-                        if (resultCounts[betItem]) {
-                            const count = resultCounts[betItem];
-                            const betAmount = currentBets[betItem];
-                            winnings += betAmount * (count + 1);
-                        }
-                    }
-                    
-                    if (winnings > 0) {
-                        alert(`🎉 Chúc mừng! Bạn đã thắng ${winnings.toLocaleString('vi-VN')}đ`);
-                    } else {
-                        alert(`😥 Rất tiếc, bạn không thắng vòng này.`);
-                    }
-
-                    currentUser.balance += winnings;
-                    currentBets = {};
-                }
-
-                resetBtn.addEventListener('click', () => {
-                    for (const item in currentBets) {
-                        currentUser.balance += currentBets[item];
-                    }
-                    currentBets = {};
-                    updateUI();
-                    alert('Đã hoàn lại tiền cược và reset bàn.');
-                });
-                
-                logoutBtn.addEventListener('click', () => {
-                    saveUserState();
-                    sessionStorage.removeItem('currentUser');
-                    currentUser = null;
-                    showScreen('login-screen');
-                });
-                
-                initializeBoard();
-            }
-
-            //============= KIỂM TRA PHIÊN ĐĂNG NHẬP =============//
-            const savedUser = sessionStorage.getItem('currentUser');
-            if (savedUser) {
-                currentUser = JSON.parse(savedUser);
-                startGame();
-            } else {
-                showScreen('login-screen');
-            }
-        });
+        // ... (JavaScript code của bạn giữ nguyên) ...
     </script>
 </body>
 </html>
