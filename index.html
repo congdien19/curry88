@@ -15,18 +15,21 @@
       font-weight: bold;
       color: #dc3545;
     }
-    .bet-options img {
-      width: 80px;
+    .bet-options button {
+      font-size: 2rem;
       margin: 5px;
-      cursor: pointer;
+      width: 80px;
+      height: 80px;
+      border-radius: 12px;
       border: 2px solid transparent;
-      border-radius: 10px;
+      background-color: white;
     }
-    .bet-options img.selected {
+    .bet-options button.selected {
       border-color: red;
+      background-color: #ffeaea;
     }
-    .dice img {
-      width: 100px;
+    .dice span {
+      font-size: 4rem;
       margin: 10px;
     }
     #gameArea {
@@ -67,15 +70,15 @@
 
   <!-- Game Area -->
   <div id="gameArea">
-    <h2 class="my-4">🎲 Chào mừng đến Bầu Cua Curry88</h2>
-    <p>Chọn 1 con vật bạn muốn cược rồi nhấn "Tung xúc xắc".</p>
+    <h2 class="my-4">🎲 Bầu Cua Curry88</h2>
+    <p>Chọn một con để cược rồi nhấn "Tung xúc xắc".</p>
     <div class="bet-options d-flex justify-content-center flex-wrap mb-3">
-      <img src="https://i.imgur.com/6Qh7N4b.png" data-name="Bầu" onclick="selectBet(this)">
-      <img src="https://i.imgur.com/JZWXt1w.png" data-name="Cua" onclick="selectBet(this)">
-      <img src="https://i.imgur.com/V08HXcW.png" data-name="Tôm" onclick="selectBet(this)">
-      <img src="https://i.imgur.com/DpZ8uV0.png" data-name="Cá" onclick="selectBet(this)">
-      <img src="https://i.imgur.com/qFcFOoL.png" data-name="Nai" onclick="selectBet(this)">
-      <img src="https://i.imgur.com/KoCN0hu.png" data-name="Gà" onclick="selectBet(this)">
+      <button onclick="selectBet(this)" data-name="Bầu">🥒</button>
+      <button onclick="selectBet(this)" data-name="Cua">🦀</button>
+      <button onclick="selectBet(this)" data-name="Tôm">🦐</button>
+      <button onclick="selectBet(this)" data-name="Cá">🐟</button>
+      <button onclick="selectBet(this)" data-name="Nai">🦌</button>
+      <button onclick="selectBet(this)" data-name="Gà">🐓</button>
     </div>
     <button class="btn btn-danger mb-3" onclick="rollDice()">🎲 Tung xúc xắc</button>
     <div class="dice" id="diceResult"></div>
@@ -86,6 +89,15 @@
   <script>
     let users = JSON.parse(localStorage.getItem("users") || "{}");
     let selectedBet = null;
+
+    const emojiMap = {
+      "Bầu": "🥒",
+      "Cua": "🦀",
+      "Tôm": "🦐",
+      "Cá": "🐟",
+      "Nai": "🦌",
+      "Gà": "🐓"
+    };
 
     function register() {
       const u = document.getElementById("registerUser").value.trim();
@@ -117,13 +129,13 @@
       selectedBet = null;
       document.getElementById("resultMessage").innerText = "";
       document.getElementById("diceResult").innerHTML = "";
-      document.querySelectorAll(".bet-options img").forEach(i => i.classList.remove("selected"));
+      document.querySelectorAll(".bet-options button").forEach(b => b.classList.remove("selected"));
     }
 
-    function selectBet(img) {
-      document.querySelectorAll(".bet-options img").forEach(i => i.classList.remove("selected"));
-      img.classList.add("selected");
-      selectedBet = img.getAttribute("data-name");
+    function selectBet(btn) {
+      document.querySelectorAll(".bet-options button").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      selectedBet = btn.getAttribute("data-name");
     }
 
     function rollDice() {
@@ -132,26 +144,17 @@
         return;
       }
 
-      const animals = ["Bầu", "Cua", "Tôm", "Cá", "Nai", "Gà"];
-      const images = [
-        "https://i.imgur.com/6Qh7N4b.png",
-        "https://i.imgur.com/JZWXt1w.png",
-        "https://i.imgur.com/V08HXcW.png",
-        "https://i.imgur.com/DpZ8uV0.png",
-        "https://i.imgur.com/qFcFOoL.png",
-        "https://i.imgur.com/KoCN0hu.png"
-      ];
-
+      const animals = Object.keys(emojiMap);
       const result = [];
       const diceResult = document.getElementById("diceResult");
       diceResult.innerHTML = "";
 
       for (let i = 0; i < 3; i++) {
-        const rand = Math.floor(Math.random() * 6);
+        const rand = Math.floor(Math.random() * animals.length);
         result.push(animals[rand]);
-        const img = document.createElement("img");
-        img.src = images[rand];
-        diceResult.appendChild(img);
+        const span = document.createElement("span");
+        span.textContent = emojiMap[animals[rand]];
+        diceResult.appendChild(span);
       }
 
       const match = result.filter(r => r === selectedBet).length;
