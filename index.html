@@ -1,318 +1,479 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
+<html lang="vi">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arrow GAme</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.1/TweenMax.min.js"></script>
-    <script src="//s3-us-west-2.amazonaws.com/s.cdpn.io/16327/MorphSVGPlugin.min.js"></script>
-    <style >
-      body{
-        margin:0;
-        background:#222;
+    <title>Game Tài Xỉu - Full Tính Năng</title>
+    <style>
+        :root {
+            --primary-color: #8B0000; /* Màu đỏ rượu vang */
+            --secondary-color: #FFD700; /* Màu vàng gold */
+            --bg-color: #014b1c; /* Màu xanh lá cây đậm (mặt bàn) */
+            --font-color: #ffffff;
+            --border-color: #FFD700;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            color: var(--font-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #game-board {
+            background-color: var(--bg-color);
+            border: 5px solid var(--border-color);
+            border-radius: 15px;
+            padding: 20px;
+            width: 100%;
+            max-width: 900px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(0,0,0,0.3);
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            color: var(--secondary-color);
+            text-shadow: 2px 2px 4px #000;
+        }
+
+        /* Player Info */
+        .player-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.3);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        #balance {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .bet-input-area {
+            display: flex;
+            gap: 10px;
+        }
+        #bet-amount {
+            width: 100px;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            background: #333;
+            color: white;
+            text-align: center;
+        }
+
+        /* Dice Area */
+        .dice-area {
+            text-align: center;
+            background: rgba(0,0,0,0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        #dice-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        .dice {
+            width: 70px;
+            height: 70px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 36px;
+            font-weight: bold;
+            background-color: #fff;
+            color: #333;
+        }
+        #result-text {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--secondary-color);
+            height: 30px;
+        }
         
-        margin:20px;
-      }
-      svg{
-        width:100%;
-        height:100%;
-        position:fixed;
-        top:0;
-        left:0;
-      }
-      span{
-        color:white;
-        font-family:sans-serif;
-        opacity:.3;
-      }
+        /* Betting Area */
+        .betting-area {
+            display: grid;
+            gap: 10px;
+        }
+        .bet-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+        }
+        .bet-option {
+            background-color: var(--primary-color);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: transform 0.2s, background-color 0.2s;
+            position: relative;
+        }
+        .bet-option:hover {
+            transform: scale(1.05);
+            background-color: #a52a2a;
+        }
+        .bet-option .payout {
+            font-size: 0.8em;
+            opacity: 0.8;
+        }
+        .bet-option .bet-placed-display {
+            position: absolute;
+            bottom: -5px;
+            right: 5px;
+            background: var(--secondary-color);
+            color: #000;
+            font-size: 0.9em;
+            font-weight: bold;
+            padding: 2px 5px;
+            border-radius: 5px;
+        }
+
+        /* Specific Bet Styles */
+        .grid-col-2 { grid-column: span 2; }
+        .grid-col-3 { grid-column: span 3; font-size: 1.5em; padding: 20px 10px; }
+        .grid-col-6 { grid-column: span 6; }
+
+        /* Bet States */
+        .bet-option.selected {
+            background-color: #c0392b;
+            border-color: #fff;
+        }
+        .bet-option.win {
+            background-color: #27ae60 !important; /* Green */
+            box-shadow: 0 0 20px #27ae60;
+            transform: scale(1.1);
+        }
+        .bet-option.lose {
+            opacity: 0.5;
+            background-color: #7f8c8d !important; /* Gray */
+        }
+        
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .control-btn {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 8px;
+            border: none;
+            color: #000;
+            background-color: var(--secondary-color);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+        .control-btn:hover {
+            transform: translateY(-2px);
+        }
+        .control-btn:disabled {
+            background-color: #b09945;
+            cursor: not-allowed;
+            transform: none;
+        }
+
     </style>
-  </head>
-  <body>
-    <svg id="game" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" overflow="visible">
-      <linearGradient id="ArcGradient" >
-          <stop offset="0"  stop-color="#fff" stop-opacity=".2"/>
-          <stop offset="50%" stop-color="#fff" stop-opacity="0"/>
-      </linearGradient>
-        <path id="arc" fill="none" stroke="url(#ArcGradient)" stroke-width="4" d="M100,250c250-400,550-400,800,0"  pointer-events="none"/>
-        <defs>
-            <g id="arrow">
-                <line x2="60" fill="none" stroke="#888" stroke-width="2" />
-                <polygon fill="#888" points="64 0 58 2 56 0 58 -2" />
-                <polygon fill="#88ce02" points="2 -3 -4 -3 -1 0 -4 3 2 3 5 0" />
-            </g>
-        </defs>
-        <g id="target">
-            <path fill="#FFF" d="M924.2,274.2c-21.5,21.5-45.9,19.9-52,3.2c-4.4-12.1,2.4-29.2,14.2-41c11.8-11.8,29-18.6,41-14.2 C944.1,228.3,945.7,252.8,924.2,274.2z" />
-            <path fill="#F4531C" d="M915.8,265.8c-14.1,14.1-30.8,14.6-36,4.1c-4.1-8.3,0.5-21.3,9.7-30.5s22.2-13.8,30.5-9.7 C930.4,235,929.9,251.7,915.8,265.8z" />
-            <path fill="#FFF" d="M908.9,258.9c-8,8-17.9,9.2-21.6,3.5c-3.2-4.9-0.5-13.4,5.6-19.5c6.1-6.1,14.6-8.8,19.5-5.6 C918.1,241,916.9,250.9,908.9,258.9z" />
-            <path fill="#F4531C" d="M903.2,253.2c-2.9,2.9-6.7,3.6-8.3,1.7c-1.5-1.8-0.6-5.4,2-8c2.6-2.6,6.2-3.6,8-2 C906.8,246.5,906.1,250.2,903.2,253.2z" />
-        </g>
-        <g id="bow" fill="none" stroke-linecap="round" vector-effect="non-scaling-stroke" pointer-events="none">
-          <polyline fill="none" stroke="#ddd" stroke-linecap="round" points="88,200 88,250 88,300"/>
-          <path fill="none" stroke="#88ce02" stroke-width="3" stroke-linecap="round" d="M88,300 c0-10.1,12-25.1,12-50s-12-39.9-12-50"/>
-        </g>
-      <g class="arrow-angle"><use x="100" y="250" xlink:href="#arrow"/></g>
-      <clipPath id="mask">
-        <polygon opacity=".5" points="0,0 1500,0 1500,200 970,290 950,240 925,220 875,280 890,295 920,310 0,350" pointer-events="none"/>
-      </clipPath>
-      <g class="arrows" clip-path="url(#mask)"  pointer-events="none">
-      </g>
-     <g class="missyou" fill="#aaa" opacity="0" transform="translate(-50, 50)">
-      <path d="M358 194L363 118 386 120 400 153 416 121 440 119 446 203 419 212 416 163 401 180 380 160 381 204"/>
-      <path d="M450 120L458 200 475 192 474 121"/>
-      <path d="M537 118L487 118 485 160 515 162 509 177 482 171 482 193 529 199 538 148 501 146 508 133 537 137"/>
-      <path d="M540 202L543 178 570 186 569 168 544 167 546 122 590 116 586 142 561 140 560 152 586 153 586 205"/>
-      <path d="M630 120 L650 160 L670 120 L690 120 L660 170 L660 200 L640 200 L640 170 L610 120 Z"/>
-      <!-- o -->
-      <path d="M700 160 A20 20 0 1 1 699.9 160"/>
-      <!-- u -->
-      <path d="M730 140 L730 180 A20 20 0 0 0 770 180 L770 140 L750 140 L750 180 A5 5 0 0 1 750 180 L750 140 Z"/>
-      <!-- ! moved -->
-      <path d="M790 150 L790 180 L810 180 L810 100 Z M790 200 L810 200 L810 220 L790 220 Z"/>
-    </g>
+</head>
+<body>
 
-    <g class="loveyou" fill="#F4531C" opacity="0" transform="translate(300, 100)">
-      <!-- L -->
-      <path d="M0 0 L0 80 L30 80 L30 70 L10 70 L10 0 Z"/>
-      <!-- O -->
-      <path d="M50 40 A20 20 0 1 1 49.9 40"/>
-      <!-- V -->
-      <path d="M80 0 L100 80 L120 0 L110 0 L100 60 L90 0 Z"/>
-      <!-- E -->
-      <path d="M140 0 L140 80 L170 80 L170 70 L150 70 L150 50 L170 50 L170 40 L150 40 L150 10 L170 10 L170 0 Z"/>
-      <!-- Y -->
-      <path d="M190 0 L205 30 L220 0 L230 0 L210 40 L210 80 L200 80 L200 40 L180 0 Z"/>
-      <!-- O -->
-      <path d="M250 40 A20 20 0 1 1 249.9 40"/>
-      <!-- U -->
-      <path d="M280 0 L280 50 A20 20 0 0 0 320 50 L320 0 L310 0 L310 50 A10 10 0 0 1 290 50 L290 0 Z"/>
-    </g>
-      <g class="hit" fill="#ffcc00" opacity="0" transform="translate(180, -80) rotate(12) ">
-        <path d="M383 114L385 195 407 191 406 160 422 155 418 191 436 189 444 112 423 119 422 141 407 146 400 113"/>
-        <path d="M449 185L453 113 477 112 464 186"/>
-        <path d="M486 113L484 130 506 130 481 188 506 187 520 131 540 135 545 119"/>
-        <path d="M526,195l5-20l22,5l-9,16L526,195z M558,164l32-44l-35-9l-19,51L558,164z"/>
-      </g>
-    </svg>
-    <span>Draw back an arrow and launch it!</span>
+<div id="game-board">
+    <div class="header">
+        <h1>Bàn Cược Tài Xỉu</h1>
+    </div>
 
-    <script>
-      var svg = document.querySelector("svg");
-      var cursor = svg.createSVGPoint();
-      var arrows = document.querySelector(".arrows");
-      var randomAngle = 0;
+    <div class="player-info">
+        <span id="balance">Điểm: 1000</span>
+        <div class="bet-input-area">
+            <label for="bet-amount">Mức cược:</label>
+            <input type="number" id="bet-amount" value="50" min="1">
+        </div>
+    </div>
 
+    <div class="dice-area">
+        <div id="dice-container">
+            <div class="dice" id="dice1">?</div>
+            <div class="dice" id="dice2">?</div>
+            <div class="dice" id="dice3">?</div>
+        </div>
+        <div id="result-text">Hãy đặt cược!</div>
+    </div>
 
-      let target = { x: 900, y: 249.5 }; // center of target
-      let lineSegment = { // target intersection line segment
-        x1: 875, y1: 280, x2: 925, y2: 220
-      };
-      let pivot = { x: 100, y: 250 }; // bow rotation point
-      aim({ clientX: 320, clientY: 300 }); // set up start drag event
-      window.addEventListener("mousedown", draw);
-      function draw(e) { // pull back arrow
-        randomAngle = Math.random() * Math.PI * 0.03 - 0.015;
-        TweenMax.to(".arrow-angle use", 0.3, { opacity: 1});
-        window.addEventListener("mousemove", aim);
-        window.addEventListener("mouseup", loose);
-        aim(e);
-      }
+    <div class="betting-area">
+        <div class="bet-grid">
+            <div class="bet-option grid-col-3" data-bet-type="xiu">XỈU<div class="payout">4-10 (1 ăn 1)</div></div>
+            <div class="bet-option grid-col-3" data-bet-type="tai">TÀI<div class="payout">11-17 (1 ăn 1)</div></div>
+            <div class="bet-option grid-col-3" data-bet-type="le">LẺ<div class="payout">1 ăn 1</div></div>
+            <div class="bet-option grid-col-3" data-bet-type="chan">CHẴN<div class="payout">1 ăn 1</div></div>
+        </div>
 
-      function aim(e) {
-        // get mouse position in relation to svg position and scale
-        var point = getMouseSVG(e);
-        point.x = Math.min(point.x, pivot.x - 7);
-        point.y = Math.max(point.y, pivot.y + 7);
-        var dx = point.x - pivot.x;
-        var dy = point.y - pivot.y;
-        // Make it more difficult by adding random angle each time
-        var angle = Math.atan2(dy, dx) + randomAngle;
-        var bowAngle = angle - Math.PI;
-        var distance = Math.min(Math.sqrt(dx * dx + dy * dy), 50);
-        var scale = Math.min(Math.max(distance / 30, 1), 2);
-        TweenMax.to("#bow", 0.3, {
-          scaleX: scale,
-          rotation: bowAngle + "rad",
-          transformOrigin: "right center"
-        });
-        var arrowX = Math.min(pivot.x - (1 / scale) * distance, 88);
-        TweenMax.to(".arrow-angle", 0.3, {
-          rotation: bowAngle + "rad",
-          svgOrigin: "100 250"
-        });
-        TweenMax.to(".arrow-angle use", 0.3, {
-          x: -distance
-        });
-        TweenMax.to("#bow polyline", 0.3, {
-          attr: {
-            points:
-              "88,200 " + Math.min(pivot.x - (1 / scale) * distance, 88) + ",250 88,300"
-          }
-        });
+        <div class="bet-grid">
+            <div class="bet-option grid-col-2" data-bet-type="total_4">Tổng 4<div class="payout">1 ăn 60</div></div>
+            <div class="bet-option grid-col-2" data-bet-type="total_5">Tổng 5<div class="payout">1 ăn 30</div></div>
+            <div class="bet-option grid-col-2" data-bet-type="total_6">Tổng 6<div class="payout">1 ăn 18</div></div>
+            <div class="bet-option grid-col-2" data-bet-type="total_7">Tổng 7<div class="payout">1 ăn 12</div></div>
+            <div class="bet-option grid-col-2" data-bet-type="total_8">Tổng 8<div class="payout">1 ăn 8</div></div>
+            <div class="bet-option grid-col-2" data-bet-type="total_9">Tổng 9<div class="payout">1 ăn 7</div></div>
+            <div class="bet-option grid-col-2" data-bet-type="total_10">Tổng 10<div class="payout">1 ăn 6</div></div>
+            <div class="bet-option grid-col-2" data-bet-type="total_11">Tổng 11<div class="payout">1 ăn 6</div></div>
+            <div class="bet-option grid-col-2" data-bet-type="total_12">Tổng 12<div class="payout">1 ăn 7</div></div>
+            <div class="bet-option grid-col-2" data-bet-type="total_13">Tổng 13<div class="payout">1 ăn 8</div></div>
+            <div class="bet-option grid-col-2" data-bet-type="total_14">Tổng 14<div class="payout">1 ăn 12</div></div>
+            <div class="bet-option grid-col-2" data-bet-type="total_15">Tổng 15<div class="payout">1 ăn 18</div></div>
+            <div class="bet-option grid-col-2" data-bet-type="total_16">Tổng 16<div class="payout">1 ăn 30</div></div>
+            <div class="bet-option grid-col-2" data-bet-type="total_17">Tổng 17<div class="payout">1 ăn 60</div></div>
+        </div>
 
-        var radius = distance * 9;
-        var offset = {
-          x: Math.cos(bowAngle) * radius,
-          y: Math.sin(bowAngle) * radius
-        };
-        var arcWidth = offset.x * 3;
+        <div class="bet-grid">
+            <div class="bet-option" data-bet-type="triple_1">1-1-1<div class="payout">1 ăn 180</div></div>
+            <div class="bet-option" data-bet-type="triple_2">2-2-2<div class="payout">1 ăn 180</div></div>
+            <div class="bet-option" data-bet-type="triple_3">3-3-3<div class="payout">1 ăn 180</div></div>
+            <div class="bet-option" data-bet-type="triple_4">4-4-4<div class="payout">1 ăn 180</div></div>
+            <div class="bet-option" data-bet-type="triple_5">5-5-5<div class="payout">1 ăn 180</div></div>
+            <div class="bet-option" data-bet-type="triple_6">6-6-6<div class="payout">1 ăn 180</div></div>
+            <div class="bet-option grid-col-6" data-bet-type="any_triple">Bộ Ba Bất Kỳ<div class="payout">1 ăn 30</div></div>
+        </div>
+        
+        <div class="bet-grid">
+            <div class="bet-option" data-bet-type="single_1">Số 1<div class="payout">1 ăn 1-3</div></div>
+            <div class="bet-option" data-bet-type="single_2">Số 2<div class="payout">1 ăn 1-3</div></div>
+            <div class="bet-option" data-bet-type="single_3">Số 3<div class="payout">1 ăn 1-3</div></div>
+            <div class="bet-option" data-bet-type="single_4">Số 4<div class="payout">1 ăn 1-3</div></div>
+            <div class="bet-option" data-bet-type="single_5">Số 5<div class="payout">1 ăn 1-3</div></div>
+            <div class="bet-option" data-bet-type="single_6">Số 6<div class="payout">1 ăn 1-3</div></div>
+        </div>
+    </div>
 
-        TweenMax.to("#arc", 0.3, {
-          attr: {
-            d:
-              "M100,250c" +
-              offset.x +
-              "," +
-              offset.y +
-              "," +
-              (arcWidth - offset.x) +
-              "," +
-              (offset.y + 50) +
-              "," +
-              arcWidth +
-              ",50"
-          },
-          autoAlpha: distance / 60
-        });
-      }
+    <div class="controls">
+        <button id="roll-btn" class="control-btn">Lắc Xúc Xắc</button>
+        <button id="reset-btn" class="control-btn" disabled>Cược Lại</button>
+    </div>
+</div>
 
-      function loose() {
-        // release arrow
-        window.removeEventListener("mousemove", aim);
-        window.removeEventListener("mouseup", loose);
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- DOM Elements ---
+        const balanceElem = document.getElementById('balance');
+        const betAmountInput = document.getElementById('bet-amount');
+        const diceElems = [document.getElementById('dice1'), document.getElementById('dice2'), document.getElementById('dice3')];
+        const resultTextElem = document.getElementById('result-text');
+        const betOptions = document.querySelectorAll('.bet-option');
+        const rollBtn = document.getElementById('roll-btn');
+        const resetBtn = document.getElementById('reset-btn');
 
-        TweenMax.to("#bow", 0.4, {
-          scaleX: 1,
-          transformOrigin: "right center",
-          ease: Elastic.easeOut
-        });
-        TweenMax.to("#bow polyline", 0.4, {
-          attr: {
-            points: "88,200 88,250 88,300"
-          },
-          ease: Elastic.easeOut
-        });
-        // duplicate arrow
-        var newArrow = document.createElementNS("http://www.w3.org/2000/svg", "use");
-        newArrow.setAttributeNS("http://www.w3.org/1999/xlink", "href", "#arrow");
-        arrows.appendChild(newArrow);
+        // --- Game State ---
+        let playerBalance = 1000;
+        let bets = {}; // e.g. { tai: 50, triple_1: 10 }
+        let isRolling = false;
 
-        // animate arrow along path
-        var path = MorphSVGPlugin.pathDataToBezier("#arc");
-        TweenMax.to([newArrow], 0.5, {
-          force3D: true,
-          bezier: {
-            type: "cubic",
-            values: path,
-            autoRotate: ["x", "y", "rotation"]
-          },
-          onUpdate: hitTest,
-          onUpdateParams: ["{self}"],
-          onComplete: onMiss,
-          ease: Linear.easeNone
-        });
-        TweenMax.to("#arc", 0.3, {
-          opacity: 0
-        });
-        //hide previous arrow
-        TweenMax.set(".arrow-angle use", {
-          opacity: 0
-        });
-      }
-
-      function hitTest(tween) {
-        // check for collisions with arrow and target
-        var arrow = tween.target[0];
-        var transform = arrow._gsTransform;
-        var radians = (transform.rotation * Math.PI) / 180;
-        var arrowSegment = {
-          x1: transform.x,
-          y1: transform.y,
-          x2: Math.cos(radians) * 60 + transform.x,
-          y2: Math.sin(radians) * 60 + transform.y
+        const PAYOUTS = {
+            tai: 1, xiu: 1, chan: 1, le: 1,
+            total_4: 60, total_5: 30, total_6: 18, total_7: 12, total_8: 8, total_9: 7, total_10: 6,
+            total_11: 6, total_12: 7, total_13: 8, total_14: 12, total_15: 18, total_16: 30, total_17: 60,
+            triple_1: 180, triple_2: 180, triple_3: 180, triple_4: 180, triple_5: 180, triple_6: 180,
+            any_triple: 30,
+            single_1: 1, single_2: 1, single_3: 1, single_4: 1, single_5: 1, single_6: 1
         };
 
-        var intersection = getIntersection(arrowSegment, lineSegment);
-        if (intersection.segment1 && intersection.segment2) {
-          tween.pause();
-          var dx = intersection.x - target.x;
-          var dy = intersection.y - target.y;
-          var distance = Math.sqrt(dx * dx + dy * dy);
-          var selector = ".hit";
-          if (distance < 7) {
-            selector = ".loveyou";
-          }
-          showMessage(selector);
-        }
-      }
-
-      function onMiss() {
-        // Damn!
-        showMessage(".missyou");
-      }
-
-      function showMessage(selector) {
-        // handle all text animations by providing selector
-        TweenMax.killTweensOf(selector);
-        TweenMax.killChildTweensOf(selector);
-        TweenMax.set(selector, {
-          autoAlpha: 1
-        });
-        TweenMax.staggerFromTo(
-          selector + " path",
-          0.5,
-          {
-            rotation: -5,
-            scale: 0,
-            transformOrigin: "center"
-          },
-          {
-            scale: 1,
-            ease: Back.easeOut
-          },
-          0.05
-        );
-        TweenMax.staggerTo(
-          selector + " path",
-          0.3,
-          {
-            delay: 2,
-            rotation: 20,
-            scale: 0,
-            ease: Back.easeIn
-          },
-          0.03
-        );
-      }
-
-      function getMouseSVG(e) {
-        // normalize mouse position within svg coordinates
-        cursor.x = e.clientX;
-        cursor.y = e.clientY;
-        return cursor.matrixTransform(svg.getScreenCTM().inverse());
-      }
-
-      function getIntersection(segment1, segment2) {
-        // find intersection point of two line segments and whether or not the point is on either line segment
-        var dx1 = segment1.x2 - segment1.x1;
-        var dy1 = segment1.y2 - segment1.y1;
-        var dx2 = segment2.x2 - segment2.x1;
-        var dy2 = segment2.y2 - segment2.y1;
-        var cx = segment1.x1 - segment2.x1;
-        var cy = segment1.y1 - segment2.y1;
-        var denominator = dy2 * dx1 - dx2 * dy1;
-        if (denominator == 0) {
-          return null;
-        }
-        var ua = (dx2 * cy - dy2 * cx) / denominator;
-        var ub = (dx1 * cy - dy1 * cx) / denominator;
-        return {
-          x: segment1.x1 + ua * dx1,
-          y: segment1.y1 + ua * dy1,
-          segment1: ua >= 0 && ua <= 1,
-          segment2: ub >= 0 && ub <= 1
+        // --- Functions ---
+        const updateBalance = (amount) => {
+            playerBalance = amount;
+            balanceElem.textContent = `Điểm: ${playerBalance}`;
         };
-      }
-    </script>
-  </body>
+
+        const placeBet = (betType, amount) => {
+            if (isRolling) return;
+            if (amount <= 0) {
+                alert("Vui lòng nhập số tiền cược hợp lệ!");
+                return;
+            }
+            if (amount > playerBalance) {
+                alert("Bạn không đủ điểm để cược!");
+                return;
+            }
+
+            // Update state
+            updateBalance(playerBalance - amount);
+            bets[betType] = (bets[betType] || 0) + amount;
+
+            // Update UI
+            const betOptionElem = document.querySelector(`[data-bet-type='${betType}']`);
+            betOptionElem.classList.add('selected');
+            
+            let display = betOptionElem.querySelector('.bet-placed-display');
+            if (!display) {
+                display = document.createElement('div');
+                display.className = 'bet-placed-display';
+                betOptionElem.appendChild(display);
+            }
+            display.textContent = bets[betType];
+        };
+
+        const rollDice = () => {
+            if (Object.keys(bets).length === 0) {
+                alert("Vui lòng đặt cược trước khi lắc!");
+                return;
+            }
+            isRolling = true;
+            toggleControls(true);
+
+            let rollCount = 0;
+            const rollInterval = setInterval(() => {
+                diceElems.forEach(d => d.textContent = Math.floor(Math.random() * 6) + 1);
+                rollCount++;
+                if (rollCount > 20) { // Animate for ~2 seconds
+                    clearInterval(rollInterval);
+                    finalizeRoll();
+                }
+            }, 100);
+        };
+
+        const finalizeRoll = () => {
+            const d1 = Math.floor(Math.random() * 6) + 1;
+            const d2 = Math.floor(Math.random() * 6) + 1;
+            const d3 = Math.floor(Math.random() * 6) + 1;
+            const diceValues = [d1, d2, d3];
+            const total = d1 + d2 + d3;
+
+            diceElems[0].textContent = d1;
+            diceElems[1].textContent = d2;
+            diceElems[2].textContent = d3;
+
+            checkWinnings(diceValues, total);
+        };
+
+        const checkWinnings = (dice, total) => {
+            const isTriple = dice[0] === dice[1] && dice[1] === dice[2];
+            let totalWinnings = 0;
+            const winningBets = new Set();
+
+            // Check each bet placed
+            for (const betType in bets) {
+                const betAmount = bets[betType];
+                let won = false;
+                let payout = PAYOUTS[betType];
+                
+                if (betType.startsWith('triple_')) {
+                    const num = parseInt(betType.split('_')[1]);
+                    if (isTriple && dice[0] === num) won = true;
+                } else if (betType === 'any_triple') {
+                    if (isTriple) won = true;
+                } else if (betType === 'tai') {
+                    if (total >= 11 && total <= 17 && !isTriple) won = true;
+                } else if (betType === 'xiu') {
+                    if (total >= 4 && total <= 10 && !isTriple) won = true;
+                } else if (betType === 'chan') {
+                    if (total % 2 === 0 && !isTriple) won = true;
+                } else if (betType === 'le') {
+                    if (total % 2 !== 0 && !isTriple) won = true;
+                } else if (betType.startsWith('total_')) {
+                    const num = parseInt(betType.split('_')[1]);
+                    if (total === num) won = true;
+                } else if (betType.startsWith('single_')) {
+                    const num = parseInt(betType.split('_')[1]);
+                    const count = dice.filter(d => d === num).length;
+                    if (count > 0) {
+                        won = true;
+                        // Single bet has special payout: 1:1 for one, 1:2 for two, 1:3 for three
+                        totalWinnings += betAmount + (betAmount * count);
+                    }
+                }
+
+                const betElem = document.querySelector(`[data-bet-type='${betType}']`);
+                if (won) {
+                    if (!betType.startsWith('single_')) { // Single bets are handled separately
+                        totalWinnings += betAmount + (betAmount * payout);
+                    }
+                    betElem.classList.add('win');
+                    winningBets.add(betType);
+                } else {
+                    betElem.classList.add('lose');
+                }
+            }
+
+            updateBalance(playerBalance + totalWinnings);
+            
+            let resultString = `Tổng: ${total}. `;
+            if (totalWinnings > 0) {
+                 resultString += `Bạn thắng ${totalWinnings} điểm!`;
+            } else {
+                 resultString += "Rất tiếc, bạn đã thua!";
+            }
+            if (isTriple) resultString += " (Bộ ba đồng nhất!)"
+
+            resultTextElem.textContent = resultString;
+        };
+
+        const toggleControls = (rolling) => {
+            rollBtn.disabled = rolling;
+            resetBtn.disabled = !rolling;
+            betAmountInput.disabled = rolling;
+            betOptions.forEach(b => b.style.pointerEvents = rolling ? 'none' : 'auto');
+        };
+
+        const resetBoard = () => {
+            if (isRolling) return;
+            bets = {};
+            isRolling = false;
+            
+            betOptions.forEach(opt => {
+                opt.classList.remove('selected', 'win', 'lose');
+                const display = opt.querySelector('.bet-placed-display');
+                if (display) display.remove();
+            });
+
+            diceElems.forEach(d => d.textContent = '?');
+            resultTextElem.textContent = "Hãy đặt cược!";
+            toggleControls(false);
+
+            if (playerBalance <= 0) {
+                alert("Bạn đã hết điểm! Tặng bạn 500 điểm để chơi tiếp.");
+                updateBalance(500);
+            }
+        };
+
+        // --- Event Listeners ---
+        betOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                const betType = option.dataset.betType;
+                const amount = parseInt(betAmountInput.value);
+                placeBet(betType, amount);
+            });
+        });
+
+        rollBtn.addEventListener('click', rollDice);
+        resetBtn.addEventListener('click', resetBoard);
+        
+        // --- Initial Setup ---
+        updateBalance(1000);
+    });
+</script>
+
+</body>
 </html>
