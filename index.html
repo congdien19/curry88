@@ -1,170 +1,153 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bầu Cua Curry88 - All in One</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        /* ... CSS hiện tại của bạn ... */
-        .auth-body {
-            background: linear-gradient(to right, #6a11cb, #2575fc);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            flex-direction: column; /* Để logo và tiêu đề xếp dọc */
-        }
-        .auth-logo {
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Bầu Cua Curry88</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    #gameArea {
+      display: none;
+    }
+    .dice img {
+      width: 100px;
+      margin: 10px;
+    }
+    .bet-options img {
+      width: 80px;
+      cursor: pointer;
+      margin: 5px;
+      border: 2px solid transparent;
+      border-radius: 10px;
+    }
+    .bet-options img.selected {
+      border-color: red;
+    }
+    .logo {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #dc3545;
+    }
+  </style>
 </head>
-<body>
+<body class="text-center p-4">
 
-    <div id="login-screen" class="auth-body">
-        <div class="auth-logo">
-            <i class="fas fa-dice-d6 fa-3x text-warning"></i>
-            <h1 class="text-light mt-2">Curry88</h1>
-        </div>
-        <div class="col-md-6 col-lg-4">
-            <div class="card shadow-lg border-0">
-                <div class="card-body p-4">
-                    <h3 class="card-title text-center mb-4">Đăng Nhập</h3>
-                    <form id="login-form">
-                        <div class="mb-3">
-                            <input type="text" class="form-control" id="username" placeholder="Tên đăng nhập" required>
-                        </div>
-                        <div class="mb-3">
-                            <input type="password" class="form-control" id="password" placeholder="Mật khẩu" required>
-                        </div>
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary fw-bold">Đăng nhập</button>
-                        </div>
-                    </form>
-                    <div class="text-center mt-3">
-                        <p class="mb-0">Chưa có tài khoản? <a href="#" id="show-register">Đăng ký ngay</a></p>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <!-- Logo thay vì hình ảnh -->
+  <div class="logo mb-3">
+    <i class="bi bi-dice-5-fill"></i> CURRY88
+  </div>
+
+  <!-- Đăng nhập/Đăng ký -->
+  <div id="authArea" class="card p-4 mx-auto" style="max-width: 400px;">
+    <ul class="nav nav-tabs mb-3" id="authTab">
+      <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#loginTab">Đăng nhập</a></li>
+      <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#registerTab">Đăng ký</a></li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane fade show active" id="loginTab">
+        <input type="text" id="loginUser" class="form-control mb-2" placeholder="Tài khoản">
+        <input type="password" id="loginPass" class="form-control mb-3" placeholder="Mật khẩu">
+        <button class="btn btn-primary w-100" onclick="login()">Đăng nhập</button>
+      </div>
+      <div class="tab-pane fade" id="registerTab">
+        <input type="text" id="registerUser" class="form-control mb-2" placeholder="Tài khoản mới">
+        <input type="password" id="registerPass" class="form-control mb-3" placeholder="Mật khẩu">
+        <button class="btn btn-success w-100" onclick="register()">Đăng ký</button>
+      </div>
     </div>
+  </div>
 
-    <div id="register-screen" class="auth-body d-none">
-        <div class="auth-logo">
-            <i class="fas fa-dice-d6 fa-3x text-success"></i>
-            <h1 class="text-light mt-2">Curry88</h1>
-        </div>
-        <div class="col-md-6 col-lg-4">
-            <div class="card shadow-lg border-0">
-                <div class="card-body p-4">
-                    <h3 class="card-title text-center mb-4">Đăng Ký Tài Khoản</h3>
-                    <form id="register-form">
-                        <div class="mb-3">
-                            <input type="text" class="form-control" id="new-username" placeholder="Tên đăng nhập" required>
-                        </div>
-                        <div class="mb-3">
-                            <input type="password" class="form-control" id="new-password" placeholder="Mật khẩu" required>
-                        </div>
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-success fw-bold">Đăng ký</button>
-                        </div>
-                    </form>
-                    <div class="text-center mt-3">
-                        <p class="mb-0">Đã có tài khoản? <a href="#" id="show-login">Đăng nhập</a></p>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <!-- Khu vực Game -->
+  <div id="gameArea">
+    <h2 class="my-4">🎲 Bầu Cua Curry88</h2>
+    <p>Chọn một con vật để đặt cược rồi nhấn "Tung xúc xắc".</p>
+    <div class="bet-options d-flex justify-content-center flex-wrap">
+      <img src="https://i.imgur.com/6Qh7N4b.png" data-name="Bầu" onclick="selectBet(this)">
+      <img src="https://i.imgur.com/JZWXt1w.png" data-name="Cua" onclick="selectBet(this)">
+      <img src="https://i.imgur.com/V08HXcW.png" data-name="Tôm" onclick="selectBet(this)">
+      <img src="https://i.imgur.com/DpZ8uV0.png" data-name="Cá" onclick="selectBet(this)">
+      <img src="https://i.imgur.com/qFcFOoL.png" data-name="Nai" onclick="selectBet(this)">
+      <img src="https://i.imgur.com/KoCN0hu.png" data-name="Gà" onclick="selectBet(this)">
     </div>
+    <button class="btn btn-danger mt-3" onclick="rollDice()">🎲 Tung xúc xắc</button>
+    <div class="dice mt-4" id="diceResult"></div>
+    <div id="resultMessage" class="mt-3 fw-bold fs-5"></div>
+    <button class="btn btn-secondary mt-4" onclick="logout()">Đăng xuất</button>
+  </div>
 
-    <div id="game-screen" class="d-none">
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
-            <div class="container">
-                <a class="navbar-brand" href="#">
-                    <i class="fas fa-dice-d6 fa-lg text-warning me-2"></i> Curry88
-                </a>
-                <div class="ms-auto text-white">
-                    <span class="me-3">Chào, <strong id="player-name" class="text-warning"></strong></span>
-                    <span class="me-3">|</span>
-                    <span class="me-3">💰 Số dư: <strong id="player-balance" class="text-success"></strong></span>
-                    <button id="logout-btn" class="btn btn-danger btn-sm"><i class="fas fa-sign-out-alt me-1"></i> Đăng xuất</button>
-                </div>
-            </div>
-        </nav>
+  <script>
+    let users = JSON.parse(localStorage.getItem("users") || "{}");
+    let selectedBet = null;
 
-        <main class="container my-4">
-            <div class="row">
-                <div class="col-lg-8">
-                    <div id="game-board-container" class="p-3 rounded bg-light shadow">
-                        <h2 class="text-center mb-3">Bàn Cược</h2>
-                        <div id="game-board" class="row g-3">
-                            <div class="col-6 col-md-4 text-center">
-                                <div class="bet-option p-3" data-item="bau">
-                                    <img src="images/bau.png" class="img-fluid">
-                                    <div class="bet-amount mt-2">Cược: <span id="bet-bau">0</span></div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-4 text-center">
-                                <div class="bet-option p-3" data-item="cua">
-                                    <img src="images/cua.png" class="img-fluid">
-                                    <div class="bet-amount mt-2">Cược: <span id="bet-cua">0</span></div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-4 text-center">
-                                <div class="bet-option p-3" data-item="tom">
-                                    <img src="images/tom.png" class="img-fluid">
-                                    <div class="bet-amount mt-2">Cược: <span id="bet-tom">0</span></div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-4 text-center">
-                                <div class="bet-option p-3" data-item="ca">
-                                    <img src="images/ca.png" class="img-fluid">
-                                    <div class="bet-amount mt-2">Cược: <span id="bet-ca">0</span></div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-4 text-center">
-                                <div class="bet-option p-3" data-item="ga">
-                                    <img src="images/ga.png" class="img-fluid">
-                                    <div class="bet-amount mt-2">Cược: <span id="bet-ga">0</span></div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-4 text-center">
-                                <div class="bet-option p-3" data-item="nai">
-                                    <img src="images/nai.png" class="img-fluid">
-                                    <div class="bet-amount mt-2">Cược: <span id="bet-nai">0</span></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    function register() {
+      const u = document.getElementById("registerUser").value;
+      const p = document.getElementById("registerPass").value;
+      if (users[u]) {
+        alert("Tài khoản đã tồn tại!");
+      } else {
+        users[u] = p;
+        localStorage.setItem("users", JSON.stringify(users));
+        alert("Đăng ký thành công! Đăng nhập ngay nhé.");
+      }
+    }
 
-                <div class="col-lg-4">
-                    <div class="p-3 rounded bg-light shadow">
-                        <h2 class="text-center mb-3">Xúc Xắc</h2>
-                        <div id="dice-section" class="mb-4 d-flex justify-content-center align-items-center" style="min-height: 150px;">
-                            <h3 id="initial-text">Hãy đặt cược và xóc!</h3>
-                        </div>
-                        <div class="d-grid gap-2">
-                            <button id="roll-btn" class="btn btn-primary btn-lg fw-bold">⚡ XÓC NGAY! ⚡</button>
-                            <button id="reset-btn" class="btn btn-info btn-sm"><i class="fas fa-undo me-1"></i> Chơi lại</button>
-                        </div>
-                    </div>
-                     <div id="history" class="mt-3 p-3 rounded bg-light shadow">
-                        <h4 class="text-center">Lịch sử ván đấu</h4>
-                        <ul id="history-list" class="list-unstyled text-center"></ul>
-                     </div>
-                </div>
-            </div>
-        </main>
-    </div>
+    function login() {
+      const u = document.getElementById("loginUser").value;
+      const p = document.getElementById("loginPass").value;
+      if (users[u] === p) {
+        document.getElementById("authArea").style.display = "none";
+        document.getElementById("gameArea").style.display = "block";
+      } else {
+        alert("Sai tài khoản hoặc mật khẩu!");
+      }
+    }
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    function logout() {
+      location.reload();
+    }
 
-    <script>
-        // ... (JavaScript code của bạn giữ nguyên) ...
-    </script>
+    function selectBet(img) {
+      document.querySelectorAll(".bet-options img").forEach(i => i.classList.remove("selected"));
+      img.classList.add("selected");
+      selectedBet = img.getAttribute("data-name");
+    }
+
+    function rollDice() {
+      if (!selectedBet) {
+        alert("Vui lòng chọn một con vật để đặt cược!");
+        return;
+      }
+      const animals = ["Bầu", "Cua", "Tôm", "Cá", "Nai", "Gà"];
+      const imgUrls = [
+        "https://i.imgur.com/6Qh7N4b.png",
+        "https://i.imgur.com/JZWXt1w.png",
+        "https://i.imgur.com/V08HXcW.png",
+        "https://i.imgur.com/DpZ8uV0.png",
+        "https://i.imgur.com/qFcFOoL.png",
+        "https://i.imgur.com/KoCN0hu.png"
+      ];
+
+      const result = [];
+      const diceResult = document.getElementById("diceResult");
+      diceResult.innerHTML = "";
+
+      for (let i = 0; i < 3; i++) {
+        const rand = Math.floor(Math.random() * 6);
+        result.push(animals[rand]);
+        const img = document.createElement("img");
+        img.src = imgUrls[rand];
+        diceResult.appendChild(img);
+      }
+
+      const match = result.filter(r => r === selectedBet).length;
+      const message = match > 0 ? `🎉 Trúng ${match} lần!` : "💥 Rớt rồi, thử lại!";
+      document.getElementById("resultMessage").innerText = message;
+    }
+  </script>
+
 </body>
 </html>
