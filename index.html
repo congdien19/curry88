@@ -2,44 +2,89 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Trích xuất ID từ link</title>
+  <title>Tool Lấy ID Facebook</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; }
-    input, button { padding: 8px; font-size: 16px; width: 100%; margin-top: 10px; }
-    #result { margin-top: 20px; font-size: 18px; color: green; }
+    body {
+      background: #f5f5f5;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px 20px;
+    }
+
+    h2 {
+      color: #333;
+    }
+
+    input[type="text"] {
+      width: 80%;
+      max-width: 500px;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 15px;
+      cursor: pointer;
+      background: #1877f2;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+
+    #result {
+      margin-top: 25px;
+      font-size: 18px;
+      font-weight: bold;
+      color: green;
+    }
+
+    footer {
+      margin-top: 50px;
+      font-size: 14px;
+      color: #777;
+    }
   </style>
 </head>
 <body>
-  <h2>🔗 Trích xuất ID từ Link</h2>
-  <input type="text" id="inputLink" placeholder="Dán link Facebook, YouTube, TikTok... vào đây">
-  <button onclick="extractID()">Lấy ID</button>
+
+  <h2>🔍 LẤY ID FACEBOOK</h2>
+
+  <input type="text" id="fbLink" placeholder="Dán link Facebook vào đây">
+  <br>
+  <button onclick="getFacebookID()">LẤY ID</button>
 
   <div id="result"></div>
 
+  <footer>
+    © 2025 Tool by Diện Dev
+  </footer>
+
   <script>
-    function extractID() {
-      const link = document.getElementById("inputLink").value.trim();
+    function getFacebookID() {
+      const link = document.getElementById("fbLink").value.trim();
       let id = "";
 
-      // Facebook post ID
-      const fbRegex = /facebook\.com\/.*?\/(?:posts|videos|reel|photo).*?\/(\d{5,})/;
-      // YouTube video ID
-      const ytRegex = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-      // TikTok video ID
-      const tiktokRegex = /tiktok\.com\/.*?\/video\/(\d{5,})/;
+      // Regex lấy ID từ post, video, reel, photo
+      const idRegex = /(?:posts|videos|photo|reel|story)\/(\d{5,})/;
+      // Regex lấy profile numeric ID nếu có ?id=1000xxxxxxx
+      const profileRegex = /facebook\.com\/profile\.php\?id=(\d+)/;
 
-      if (fbRegex.test(link)) {
-        id = fbRegex.exec(link)[1];
-      } else if (ytRegex.test(link)) {
-        id = ytRegex.exec(link)[1];
-      } else if (tiktokRegex.test(link)) {
-        id = tiktokRegex.exec(link)[1];
+      if (idRegex.test(link)) {
+        id = idRegex.exec(link)[1];
+      } else if (profileRegex.test(link)) {
+        id = profileRegex.exec(link)[1];
       } else {
-        id = "❌ Không tìm thấy ID trong link.";
+        id = "❌ Không tìm thấy ID trong link!";
       }
 
-      document.getElementById("result").innerText = `🆔 ID là: ${id}`;
+      document.getElementById("result").innerHTML = `🆔 ID: <span>${id}</span>`;
     }
   </script>
+
 </body>
 </html>
