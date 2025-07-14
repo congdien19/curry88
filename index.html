@@ -1,4 +1,14 @@
-<!DOCTYPE html>
+import zipfile
+import os
+
+# Đường dẫn thư mục chứa project
+project_dir = "/mnt/data/id-extractor-web"
+
+# Tạo các file cần thiết
+os.makedirs(f"{project_dir}/public", exist_ok=True)
+
+# index.html (from user-provided version)
+index_html_content = """<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
@@ -99,9 +109,7 @@
   </style>
 </head>
 <body>
-<div id="loading" style="display:none">
-  <div class="loader"></div>
-</div>
+<div id="loading" style="display:none"><div class="loader"></div></div>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container">
     <a class="navbar-brand fw-bold" href="#">CurryID</a>
@@ -143,28 +151,22 @@
   function hideLoading() {
     document.getElementById('loading').style.display = 'none';
   }
-
   function showResult(id) {
     document.getElementById('resultId').innerText = id;
     document.getElementById('resultBox').style.display = 'block';
   }
-
   function convertLink() {
     const link = document.getElementById('linkInput').value.trim();
     if (!link) {
       Swal.fire({ icon: 'warning', title: 'Vui lòng nhập link!' });
       return;
     }
-
     showLoading();
-
     setTimeout(() => {
       let id = null;
-
-      const fbPostRegex = /(?:posts|videos|photo|reel|story)\/(\d{5,})/;
-      const fbProfileRegex = /facebook\.com\/profile\.php\?id=(\d{5,})/;
-      const tiktokVideoRegex = /tiktok\.com\/.*?\/video\/(\d{5,})/;
-
+      const fbPostRegex = /(?:posts|videos|photo|reel|story)\\/(\\d{5,})/;
+      const fbProfileRegex = /facebook\\.com\\/profile\\.php\\?id=(\\d{5,})/;
+      const tiktokVideoRegex = /tiktok\\.com\\/.*?\\/video\\/(\\d{5,})/;
       if (fbPostRegex.test(link)) {
         id = fbPostRegex.exec(link)[1];
       } else if (fbProfileRegex.test(link)) {
@@ -172,19 +174,14 @@
       } else if (tiktokVideoRegex.test(link)) {
         id = tiktokVideoRegex.exec(link)[1];
       }
-
       if (id) {
         hideLoading();
         showResult(id);
       } else {
-        // Nếu regex không tìm thấy → gọi API phụ
         $.get(`/api/get-id?link=${encodeURIComponent(link)}`, function (data) {
           hideLoading();
-          if (data && data.id) {
-            showResult(data.id);
-          } else {
-            Swal.fire({ icon: 'error', title: 'Không tìm thấy ID qua API!' });
-          }
+          if (data && data.id) showResult(data.id);
+          else Swal.fire({ icon: 'error', title: 'Không tìm thấy ID qua API!' });
         }).fail(() => {
           hideLoading();
           Swal.fire({ icon: 'error', title: 'Lỗi khi gọi API!' });
@@ -192,7 +189,6 @@
       }
     }, 500);
   }
-
   function copyResult() {
     const id = document.getElementById('resultId').innerText;
     navigator.clipboard.writeText(id).then(() => {
@@ -209,3 +205,81 @@
 </script>
 </body>
 </html>
+"""
+
+with open(f"{project_dir}/public/index.html", "w", encoding="utf-8") as f:
+    f.write(index_html_content)
+
+# server.js file
+server_js = """const express = require('express');
+const axios = require('axios');
+const cheerio = require('cheerio');
+const cors = require('cors');
+
+const app = express();
+app.use(cors());
+app.use(express.static('public'));
+
+app.get('/api/get-id', async (req, res) => {
+  const link = req.query.link;
+  if (!link) return res.status(400).json({ error: 'Thiếu link' });
+
+  try {
+    const response = await axios.get(link, {
+      headers: { 'User-Agent': 'Mozilla/5.0' }
+    });
+
+    const html = response.data;
+    const $ = cheerio.load(html);
+
+    const fbMeta = $('meta[property="al:android:url"]').attr('content');
+    const fbId = fbMeta?.match(/id=(\\d{5,})/)?.[1];
+    const tiktokId = html.match(/\"id\":\"(\\d{5,})\"/)?.[1];
+
+    const finalId = fbId || tiktokId;
+    res.json({ id: finalId || null });
+  } catch (err) {
+    res.status(500).json({ error: 'Lỗi khi gọi đến link' });
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`✅ Server đang chạy tại http://localhost:${PORT}`);
+});
+"""
+
+with open(f"{project_dir}/server.js", "w", encoding="utf-8") as f:
+    f.write(server_js)
+
+# package.json
+package_json = """{
+  "name": "id-extractor-web",
+  "version": "1.0.0",
+  "description": "Tool lấy ID từ link Facebook và TikTok",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.8",
+    "cheerio": "^1.0.0-rc.12",
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  }
+}
+"""
+
+with open(f"{project_dir}/package.json", "w", encoding="utf-8") as f:
+    f.write(package_json)
+
+# Tạo file zip
+zip_path = "/mnt/data/id-extractor-web.zip"
+with zipfile.ZipFile(zip_path, "w") as zipf:
+    for foldername, _, filenames in os.walk(project_dir):
+        for filename in filenames:
+            file_path = os.path.join(foldername, filename)
+            zipf.write(file_path, os.path.relpath(file_path, project_dir))
+
+zip_path
+
