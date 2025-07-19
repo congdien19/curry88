@@ -15,7 +15,112 @@
       min-height: 100vh;
       margin: 0;
       padding: 0;
+    }<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Tool Lấy UID Facebook</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
     }
+
+    .container {
+      background: white;
+      padding: 30px 40px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px 25px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-weight: bold;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Tool Lấy UID Facebook</h2>
+    <input type="text" id="fbLink" placeholder="Nhập link Facebook cá nhân, nhóm, bài viết...">
+    <button onclick="getUID()">Lấy UID</button>
+    <p id="result"></p>
+  </div>
+
+  <script>
+    function getUID() {
+      const link = document.getElementById("fbLink").value.trim();
+      const resultEl = document.getElementById("result");
+
+      if (!link) {
+        resultEl.innerText = "⚠️ Vui lòng nhập link Facebook!";
+        resultEl.style.color = "red";
+        return;
+      }
+
+      const apiUrl = 'https://id.traodoisub.com/api.php?link=' + encodeURIComponent(link);
+
+      resultEl.innerText = "⏳ Đang lấy UID...";
+      resultEl.style.color = "#555";
+
+      fetch(apiUrl)
+        .then(response => response.text())
+        .then(uid => {
+          if (uid && uid.length >= 5) {
+            resultEl.innerText = "✅ UID: " + uid;
+            resultEl.style.color = "green";
+          } else {
+            resultEl.innerText = "❌ Không lấy được UID. Hãy kiểm tra lại link.";
+            resultEl.style.color = "red";
+          }
+        })
+        .catch(error => {
+          resultEl.innerText = "🚫 Lỗi kết nối: " + error;
+          resultEl.style.color = "red";
+        });
+    }
+  </script>
+</body>
+</html>
+
     #loading {
       position: fixed;
       top: 0; left: 0; width: 100vw; height: 100vh;
