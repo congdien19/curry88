@@ -2,103 +2,98 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Tool Lấy UID Facebook</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lấy ID Facebook</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f0f0f0;
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 0;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      margin: 0;
     }
 
     .container {
       background: white;
-      padding: 30px 40px;
+      padding: 30px;
       border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
       text-align: center;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
-      max-width: 400px;
       width: 100%;
+      max-width: 400px;
     }
 
-    h2 {
-      margin-bottom: 20px;
-      color: #333;
-    }
-
-    input {
+    input[type="text"] {
       width: 100%;
       padding: 12px;
-      margin: 10px 0;
+      margin-top: 10px;
+      margin-bottom: 20px;
       border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 16px;
+      border-radius: 8px;
     }
 
     button {
-      padding: 10px 25px;
-      background: #007bff;
+      background: #1877f2;
       color: white;
+      padding: 12px 20px;
       border: none;
-      border-radius: 6px;
-      font-size: 16px;
+      border-radius: 8px;
       cursor: pointer;
-      transition: background 0.3s ease;
     }
 
     button:hover {
-      background: #0056b3;
+      background: #145fd1;
     }
 
     #result {
       margin-top: 20px;
       font-weight: bold;
-      color: green;
+      color: #333;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Tool Lấy UID Facebook</h2>
-    <input type="text" id="fbLink" placeholder="Nhập link Facebook cá nhân, group, bài viết...">
-    <button onclick="getUID()">Lấy UID</button>
-    <p id="result"></p>
+    <h2>Lấy ID Facebook từ Link</h2>
+    <input type="text" id="fbLink" placeholder="Dán link Facebook vào đây..." />
+    <button onclick="getFbId()">Lấy ID</button>
+    <div id="result"></div>
   </div>
 
   <script>
-    function getUID() {
+    async function getFbId() {
       const link = document.getElementById("fbLink").value.trim();
-      const resultEl = document.getElementById("result");
+      const resultDiv = document.getElementById("result");
 
-      if (!link) {
-        resultEl.innerText = "⚠️ Vui lòng nhập link Facebook!";
-        resultEl.style.color = "red";
+      if (!link.startsWith("http")) {
+        resultDiv.innerHTML = "❌ Vui lòng nhập link hợp lệ!";
         return;
       }
 
-      const apiUrl = 'https://id.traodoisub.com/api.php?link=' + encodeURIComponent(link);
+      resultDiv.innerHTML = "⏳ Đang lấy ID...";
 
-      resultEl.innerText = "⏳ Đang lấy UID...";
-      resultEl.style.color = "#555";
-
-      fetch(apiUrl)
-        .then(response => response.text())
-        .then(uid => {
-          if (uid && uid.length >= 5) {
-            resultEl.innerText = "✅ UID: " + uid;
-            resultEl.style.color = "green";
-          } else {
-            resultEl.innerText = "❌ Không lấy được UID. Kiểm tra lại link!";
-            resultEl.style.color = "red";
-          }
-        })
-        .catch(error => {
-          resultEl.innerText = "🚫 Lỗi kết nối: " + error;
-          resultEl.style.color = "red";
+      try {
+        const res = await fetch("https://findmyfbid.com", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body: `url=${encodeURIComponent(link)}`
         });
+
+        const data = await res.json();
+
+        if (data && data.id) {
+          resultDiv.innerHTML = `✅ UID Facebook là: <b>${data.id}</b>`;
+        } else {
+          resultDiv.innerHTML = "❌ Không thể lấy được ID. Hãy chắc chắn link đúng và công khai.";
+        }
+      } catch (error) {
+        resultDiv.innerHTML = "❌ Lỗi kết nối. Hãy thử lại sau.";
+      }
     }
   </script>
 </body>
