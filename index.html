@@ -18,8 +18,8 @@
       background: white;
       padding: 30px 40px;
       border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
       text-align: center;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
       max-width: 400px;
       width: 100%;
     }
@@ -63,7 +63,7 @@
 <body>
   <div class="container">
     <h2>Tool Lấy UID Facebook</h2>
-    <input type="text" id="fbLink" placeholder="Nhập link Facebook cá nhân, nhóm, bài viết...">
+    <input type="text" id="fbLink" placeholder="Nhập link Facebook cá nhân, group, bài viết...">
     <button onclick="getUID()">Lấy UID</button>
     <p id="result"></p>
   </div>
@@ -91,7 +91,7 @@
             resultEl.innerText = "✅ UID: " + uid;
             resultEl.style.color = "green";
           } else {
-            resultEl.innerText = "❌ Không lấy được UID. Hãy kiểm tra lại link.";
+            resultEl.innerText = "❌ Không lấy được UID. Kiểm tra lại link!";
             resultEl.style.color = "red";
           }
         })
