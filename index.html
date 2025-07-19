@@ -2,76 +2,103 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Lấy ID Facebook</title>
+  <title>Lấy UID Facebook</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
-      font-family: Arial;
+      background: #f7f7f7;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      background: #f4f4f4;
     }
-    .box {
+
+    .container {
       background: white;
       padding: 30px;
       border-radius: 10px;
-      box-shadow: 0 0 10px #ccc;
-      width: 400px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 100%;
       text-align: center;
     }
-    input {
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
       width: 100%;
       padding: 10px;
       margin-bottom: 15px;
       border-radius: 6px;
       border: 1px solid #ccc;
+      font-size: 16px;
     }
+
     button {
       padding: 10px 20px;
       background: #1877f2;
       color: white;
       border: none;
       border-radius: 6px;
+      font-size: 16px;
       cursor: pointer;
     }
+
+    button:hover {
+      background: #0f65d1;
+    }
+
     #result {
-      margin-top: 15px;
+      margin-top: 20px;
       font-weight: bold;
+      font-size: 16px;
+    }
+
+    .error {
+      color: red;
+    }
+
+    .success {
+      color: green;
     }
   </style>
 </head>
 <body>
-  <div class="box">
-    <h2>Nhập link Facebook:</h2>
-    <input type="text" id="fbLink" placeholder="https://facebook.com/..." />
-    <button onclick="getId()">Lấy ID</button>
+  <div class="container">
+    <h2>Lấy UID Facebook</h2>
+    <input type="text" id="fbLink" placeholder="Nhập link Facebook (vd: https://fb.com/username)" />
+    <button onclick="layUid()">Lấy ID</button>
     <div id="result"></div>
   </div>
 
   <script>
-    async function getId() {
-      const link = document.getElementById('fbLink').value.trim();
-      const resultDiv = document.getElementById('result');
+    async function layUid() {
+      const link = document.getElementById("fbLink").value.trim();
+      const result = document.getElementById("result");
 
-      if (!link.startsWith('http')) {
-        resultDiv.innerHTML = '❌ Vui lòng nhập link hợp lệ!';
+      if (!link || !link.includes("facebook.com") && !link.includes("fb.com")) {
+        result.innerHTML = '<span class="error">❌ Link Facebook không hợp lệ!</span>';
         return;
       }
 
-      resultDiv.innerHTML = '⏳ Đang xử lý...';
+      result.innerHTML = "⏳ Đang xử lý...";
 
       try {
         const res = await fetch(`https://id.traodoisub.com/api.php?link=${encodeURIComponent(link)}`);
-        const data = await res.text();
+        const text = await res.text();
 
-        if (data && !data.includes("error")) {
-          resultDiv.innerHTML = `✅ UID là: <b>${data}</b>`;
+        if (!isNaN(text)) {
+          result.innerHTML = `<span class="success">✅ UID là: <b>${text}</b></span>`;
         } else {
-          resultDiv.innerHTML = '❌ Không thể lấy UID. Link sai hoặc profile ẩn.';
+          result.innerHTML = `<span class="error">❌ Không thể lấy UID. Hãy kiểm tra lại link!</span>`;
         }
       } catch (e) {
-        resultDiv.innerHTML = '❌ Lỗi kết nối đến server.';
+        result.innerHTML = '<span class="error">❌ Lỗi kết nối đến server. Vui lòng thử lại sau.</span>';
       }
     }
   </script>
